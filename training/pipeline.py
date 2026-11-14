@@ -113,7 +113,7 @@ def evaluate_and_log(paths: dict[str, str], model_info: dict[str, Any], dag_run_
                      tracking_uri: str | None = None) -> dict[str, Any]:
     import mlflow
     from mlflow.tracking import MlflowClient
-    uri = tracking_uri or os.getenv("MLFLOW_TRACKING_URI", f"file:{REPO / 'mlruns'}")
+    uri = tracking_uri or os.getenv("MLFLOW_TRACKING_URI", f"sqlite:///{(REPO / 'mlflow.db').as_posix()}")
     mlflow.set_tracking_uri(uri)
     mlflow.set_experiment(EXPERIMENT)
     client = MlflowClient(uri)
