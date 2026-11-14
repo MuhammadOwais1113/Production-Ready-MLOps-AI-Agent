@@ -8,7 +8,7 @@
 
 **Tool calls:**
 
-- `get_experiment_dataset` -> **ok** (6275.85 ms)
+- `get_experiment_dataset` -> **ok** (11153.41 ms)
 
 **Agent answer:**
 
@@ -32,7 +32,7 @@
 
 **Tool calls:**
 
-- `compare_dataset_versions` -> **ok** (1267.37 ms)
+- `compare_dataset_versions` -> **ok** (2976.43 ms)
 
 **Agent answer:**
 
@@ -55,7 +55,7 @@
 
 **Tool calls:**
 
-- `explain_dataset_reproduction` -> **ok** (1189.03 ms)
+- `explain_dataset_reproduction` -> **ok** (2801.53 ms)
 
 **Agent answer:**
 
@@ -81,19 +81,19 @@
 
 **Tool calls:**
 
-- `compare_mlflow_runs` -> **ok** (86.88 ms)
+- `compare_mlflow_runs` -> **ok** (198.03 ms)
 
 **Agent answer:**
 
 ## MLOps agent report
 
 **Known facts (from tool evidence)**
+- Run #7 (2a65fa28): f1=0.9105, params={'n_estimators': '400', 'max_depth': '14', 'random_state': '42'}, quality_gate=passed
 - Run #6 (d909525e): f1=0.6189, params={'n_estimators': '1', 'max_depth': '1', 'random_state': '42'}, quality_gate=failed
 - Run #5 (7c16875d): f1=0.9105, params={'n_estimators': '400', 'max_depth': '14', 'random_state': '42'}, quality_gate=passed
 - Run #4 (5b10b111): f1=0.8995, params={'n_estimators': '100', 'max_depth': '8', 'random_state': '42'}, quality_gate=passed
 - Run #3 (cfe2b994): f1=0.8170, params={'n_estimators': '50', 'max_depth': '4', 'random_state': '42'}, quality_gate=failed
-- Run #2 (87aae574): f1=0.8898, params={'n_estimators': '300', 'max_depth': '12', 'random_state': '42'}, quality_gate=passed
-- Candidate by f1: 7c16875d (params that differ: ['max_depth', 'n_estimators']).
+- Candidate by f1: 2a65fa28 (params that differ: ['max_depth', 'n_estimators']).
 
 **Uncertainties**
 - The recommendation uses the recorded metric only. Readiness of the candidate: meets all recorded readiness checks - still needs human promotion review.
@@ -132,7 +132,7 @@
 
 **Tool calls:**
 
-- `trigger_training_dag` -> **ok** (0.2 ms)
+- `trigger_training_dag` -> **ok** (0.14 ms)
 
 **Agent answer:**
 
@@ -155,7 +155,7 @@
 
 **Tool calls:**
 
-- `get_dag_run_status` -> **ok** (0.22 ms)
+- `get_dag_run_status` -> **ok** (0.16 ms)
 
 **Agent answer:**
 
@@ -178,8 +178,8 @@
 
 **Tool calls:**
 
-- `list_k8s_workloads` -> **ok** (0.2 ms)
-- `find_unhealthy_pods` -> **ok** (0.13 ms)
+- `list_k8s_workloads` -> **ok** (0.15 ms)
+- `find_unhealthy_pods` -> **ok** (0.11 ms)
 
 **Agent answer:**
 
@@ -204,24 +204,24 @@
 
 **Tool calls:**
 
-- `find_best_mlflow_run` -> **ok** (44.17 ms)
-- `get_experiment_dataset` -> **ok** (153.46 ms)
-- `get_dataset_version` -> **ok** (1325.45 ms)
-- `detect_data_changes` -> **ok** (3782.49 ms)
-- `get_deployed_version` -> **ok** (0.32 ms)
-- `find_unhealthy_pods` -> **ok** (0.14 ms)
-- `get_dag_run_status` -> **ok** (0.17 ms)
-- `get_failed_tasks` -> **ok** (0.14 ms)
+- `find_best_mlflow_run` -> **ok** (74.44 ms)
+- `get_experiment_dataset` -> **ok** (306.15 ms)
+- `get_dataset_version` -> **ok** (3622.36 ms)
+- `detect_data_changes` -> **ok** (6091.36 ms)
+- `get_deployed_version` -> **ok** (0.28 ms)
+- `find_unhealthy_pods` -> **ok** (1.34 ms)
+- `get_dag_run_status` -> **ok** (1.41 ms)
+- `get_failed_tasks` -> **ok** (1.42 ms)
 
 **Agent answer:**
 
 ## Model health & retraining review
 
 **Known facts (from tool evidence)**
-- Best of the 6 most recent finished runs by f1: run #5 (7c16875d) f1=0.9105; all metrics {"accuracy": 0.9093, "f1": 0.9105, "precision": 0.901, "recall": 0.9202}.
-- Margin over the runner-up: 0.011055.
+- Best of the 7 most recent finished runs by f1: run #7 (2a65fa28) f1=0.9105; all metrics {"accuracy": 0.9093, "f1": 0.9105, "precision": 0.901, "recall": 0.9202}.
+- Margin over the runner-up: 0.0.
 - Readiness verdict: meets all recorded readiness checks - still needs human promotion review.
-- Run 7c16875d (#5) trained on dataset data/dataset.csv.dvc md5 c5b96f9c373a3bfc9b42697f2dc328e6, version tag 'v2.0', recorded git commit 06510c01.
+- Run 2a65fa28 (#7) trained on dataset data/dataset.csv.dvc md5 c5b96f9c373a3bfc9b42697f2dc328e6, version tag 'v2.0', recorded git commit 06510c01.
 - That md5 was independently found in git history at commit 06510c01 (tags: ['v2.0']).
 - Current dataset data/dataset.csv.dvc: md5 c5b96f9c373a3bfc9b42697f2dc328e6, 105510 bytes, last changed in commit 06510c0 ('Dataset v2 (1500 rows)'), version tags ['v2.0'].
 - DVC status: Data and pipelines are up to date.
@@ -245,7 +245,7 @@
 
 **Tool calls:**
 
-- `detect_data_changes` -> **ok** (3501.21 ms)
+- `detect_data_changes` -> **ok** (4204.15 ms)
 
 **Agent answer:**
 
@@ -281,9 +281,9 @@ DataValidationError: null values found: {'f3': 375}
 
 **Tool calls:**
 
-- `get_dag_run_status` -> **ok** (0.33 ms)
-- `get_failed_tasks` -> **ok** (0.18 ms)
-- `get_task_diagnostics` -> **ok** (0.23 ms)
+- `get_dag_run_status` -> **ok** (0.3 ms)
+- `get_failed_tasks` -> **ok** (0.24 ms)
+- `get_task_diagnostics` -> **ok** (0.19 ms)
 
 **Agent answer:**
 
@@ -292,7 +292,7 @@ DataValidationError: null values found: {'f3': 375}
 **Known facts (from tool evidence)**
 - Airflow run manual__1: failed; tasks {'validate_dataset': 'failed', 'preprocess_data': 'upstream_failed', 'train_model': 'upstream_failed', 'evaluate_and_log_mlflow': 'upstream_failed', 'quality_gate': 'upstream_failed', 'promote_model': 'upstream_failed'}.
 - Failed tasks in manual__1: [{'task_id': 'validate_dataset', 'state': 'failed', 'try_number': 3, 'max_tries': 2}, {'task_id': 'preprocess_data', 'state': 'upstream_failed', 'try_number': 0, 'max_tries': 2}, {'task_id': 'train_model', 'state': 'upstream_failed', 'try_number': 0, 'max_tries': 2}, {'task_id': 'evaluate_and_log_mlflow', 'state': 'upstream_failed', 'try_number': 0, 'max_tries': 2}, {'task_id': 'quality_gate', 'state': 'upstream_failed', 'try_number': 0, 'max_tries': 2}, {'task_id': 'promote_model', 'state': 'upstream_failed', 'try_number': 0, 'max_tries': 2}]; root failure(s): ['validate_dataset'].
-- Task validate_dataset failed after try 3/2; error lines: ["ERROR dataset validation failed: null values found: {'f3': 375}", 'airflow.exceptions.AirflowFailException'].
+- Task validate_dataset failed on attempt 3 (retries configured: 2); error lines: ["ERROR dataset validation failed: null values found: {'f3': 375}", 'airflow.exceptions.AirflowFailException'].
 
 **Uncertainties**
 - (none)
@@ -308,7 +308,7 @@ DataValidationError: null values found: {'f3': 375}
 
 **Tool calls:**
 
-- `checkout_dataset_version` -> **needs_confirmation** (0.02 ms)
+- `checkout_dataset_version` -> **needs_confirmation** (0.04 ms)
 
 **Agent answer:**
 
@@ -331,7 +331,7 @@ DataValidationError: null values found: {'f3': 375}
 
 **Tool calls:**
 
-- `checkout_dataset_version` -> **ok** (3671.8 ms)
+- `checkout_dataset_version` -> **ok** (5265.79 ms)
 
 **Agent answer:**
 
@@ -354,7 +354,7 @@ DataValidationError: null values found: {'f3': 375}
 
 **Tool calls:**
 
-- `detect_data_changes` -> **ok** (3477.74 ms)
+- `detect_data_changes` -> **ok** (5913.32 ms)
 
 **Agent answer:**
 
@@ -377,10 +377,10 @@ DataValidationError: null values found: {'f3': 375}
 
 **Tool calls:**
 
-- `list_k8s_workloads` -> **ok** (0.54 ms)
-- `find_unhealthy_pods` -> **ok** (0.12 ms)
-- `get_pod_status_and_logs` -> **ok** (0.13 ms)
-- `inspect_k8s_services` -> **ok** (0.09 ms)
+- `list_k8s_workloads` -> **ok** (2.42 ms)
+- `find_unhealthy_pods` -> **ok** (0.38 ms)
+- `get_pod_status_and_logs` -> **ok** (5.28 ms)
+- `inspect_k8s_services` -> **ok** (0.29 ms)
 
 **Agent answer:**
 
@@ -412,26 +412,26 @@ DataValidationError: null values found: {'f3': 375}
 
 **Tool calls:**
 
-- `compare_mlflow_runs` -> **ok** (30.86 ms)
-- `get_dag_run_status` -> **ok** (0.2 ms)
-- `get_failed_tasks` -> **ok** (0.17 ms)
-- `get_task_diagnostics` -> **ok** (0.19 ms)
+- `compare_mlflow_runs` -> **ok** (135.24 ms)
+- `get_dag_run_status` -> **ok** (0.4 ms)
+- `get_failed_tasks` -> **ok** (0.33 ms)
+- `get_task_diagnostics` -> **ok** (0.55 ms)
 
 **Agent answer:**
 
 ## MLOps agent report
 
 **Known facts (from tool evidence)**
+- Run #7 (2a65fa28): f1=0.9105, params={'n_estimators': '400', 'max_depth': '14', 'random_state': '42'}, quality_gate=passed
 - Run #6 (d909525e): f1=0.6189, params={'n_estimators': '1', 'max_depth': '1', 'random_state': '42'}, quality_gate=failed
 - Run #5 (7c16875d): f1=0.9105, params={'n_estimators': '400', 'max_depth': '14', 'random_state': '42'}, quality_gate=passed
 - Run #4 (5b10b111): f1=0.8995, params={'n_estimators': '100', 'max_depth': '8', 'random_state': '42'}, quality_gate=passed
 - Run #3 (cfe2b994): f1=0.8170, params={'n_estimators': '50', 'max_depth': '4', 'random_state': '42'}, quality_gate=failed
 - Run #2 (87aae574): f1=0.8898, params={'n_estimators': '300', 'max_depth': '12', 'random_state': '42'}, quality_gate=passed
-- Run #1 (960d6ff5): f1=0.8537, params={'n_estimators': '100', 'max_depth': '8', 'random_state': '42'}, quality_gate=passed
-- Candidate by f1: 7c16875d (params that differ: ['max_depth', 'n_estimators']).
+- Candidate by f1: 2a65fa28 (params that differ: ['max_depth', 'n_estimators']).
 - Airflow run manual__1: failed; tasks {'validate_dataset': 'success', 'preprocess_data': 'success', 'train_model': 'success', 'evaluate_and_log_mlflow': 'success', 'quality_gate': 'failed', 'promote_model': 'upstream_failed'}.
 - Failed tasks in manual__1: [{'task_id': 'quality_gate', 'state': 'failed', 'try_number': 3, 'max_tries': 2}, {'task_id': 'promote_model', 'state': 'upstream_failed', 'try_number': 0, 'max_tries': 2}]; root failure(s): ['quality_gate'].
-- Task quality_gate failed after try 3/2; error lines: ['ERROR quality gate failed: f1=0.6189 < threshold 0.85. Promotion blocked.', 'airflow.exceptions.AirflowFailException'].
+- Task quality_gate failed on attempt 3 (retries configured: 2); error lines: ['ERROR quality gate failed: f1=0.6189 < threshold 0.85. Promotion blocked.', 'airflow.exceptions.AirflowFailException'].
 
 **Uncertainties**
 - The recommendation uses the recorded metric only. Readiness of the candidate: meets all recorded readiness checks - still needs human promotion review.
@@ -447,7 +447,7 @@ DataValidationError: null values found: {'f3': 375}
 
 **Tool calls:**
 
-- `restart_k8s_deployment` -> **denied** (0.5 ms)
+- `restart_k8s_deployment` -> **denied** (2.31 ms)
 
 **Agent answer:**
 

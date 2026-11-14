@@ -1,0 +1,9 @@
+$ docker run mlops-inference:1.0.0   (healthy)
+{"status":"ready"}
+{"prediction":1,"model_version":"5"}
+$ docker run -e MODEL_PATH=<missing file> mlops-inference:1.0.0   (injected failure)
+GET /health -> 200
+{"detail":"model not loaded: FileNotFoundError: [Errno 2] No such file or directory: 'C:/Program Files/Git/models/model_v9.joblib'"}
+GET /ready -> 503
+2026-11-14 10:29:32,063 ERROR MODEL LOAD FAILED: FileNotFoundError: [Errno 2] No such file or directory: 'C:/Program Files/Git/models/model_v9.joblib'
+2026-11-14 10:29:38,881 ERROR readiness failed: FileNotFoundError: [Errno 2] No such file or directory: 'C:/Program Files/Git/models/model_v9.joblib'

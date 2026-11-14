@@ -1,0 +1,5 @@
+Live Airflow 3 / Kubernetes were NOT exercised in the authoring environment:
+- Kubernetes: no cluster available (Docker Desktop Kubernetes not enabled; a kind download was blocked by the permission system and not worked around).
+- Airflow 3: infra/docker-compose.yaml (MLflow + Airflow 3 standalone) validates with `docker compose config`; the stack start was interrupted because Docker Desktop was manually paused (MLflow container exited 137). The DAG file was therefore verified statically (AST/structure test, ruff) and its stage functions run for real via training/train.py; it has not been parsed by an Airflow 3 scheduler here.
+- Real container evidence: the inference image was built and run with Docker (see evidence/inference_container.txt): healthy -> /ready 200, /predict works; missing model -> /health 200, /ready 503.
+To produce live screenshots: unpause Docker, `cd infra && docker compose up -d`, enable Kubernetes, apply kubernetes/*.yaml, then `python scripts/demo.py --live`.

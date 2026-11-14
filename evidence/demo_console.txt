@@ -50,12 +50,12 @@ USER: Compare the last five training runs and recommend the best candidate based
 ## MLOps agent report
 
 **Known facts (from tool evidence)**
+- Run #7 (2a65fa28): f1=0.9105, params={'n_estimators': '400', 'max_depth': '14', 'random_state': '42'}, quality_gate=passed
 - Run #6 (d909525e): f1=0.6189, params={'n_estimators': '1', 'max_depth': '1', 'random_state': '42'}, quality_gate=failed
 - Run #5 (7c16875d): f1=0.9105, params={'n_estimators': '400', 'max_depth': '14', 'random_state': '42'}, quality_gate=passed
 - Run #4 (5b10b111): f1=0.8995, params={'n_estimators': '100', 'max_depth': '8', 'random_state': '42'}, quality_gate=passed
 - Run #3 (cfe2b994): f1=0.8170, params={'n_estimators': '50', 'max_depth': '4', 'random_state': '42'}, quality_gate=failed
-- Run #2 (87aae574): f1=0.8898, params={'n_estimators': '300', 'max_depth': '12', 'random_state': '42'}, quality_gate=passed
-- Candidate by f1: 7c16875d (params that differ: ['max_depth', 'n_estimators']).
+- Candidate by f1: 2a65fa28 (params that differ: ['max_depth', 'n_estimators']).
 
 **Uncertainties**
 - The recommendation uses the recorded metric only. Readiness of the candidate: meets all recorded readiness checks - still needs human promotion review.
@@ -127,10 +127,10 @@ USER: Find the best recent model, identify the dataset version used to train it,
 ## Model health & retraining review
 
 **Known facts (from tool evidence)**
-- Best of the 6 most recent finished runs by f1: run #5 (7c16875d) f1=0.9105; all metrics {"accuracy": 0.9093, "f1": 0.9105, "precision": 0.901, "recall": 0.9202}.
-- Margin over the runner-up: 0.011055.
+- Best of the 7 most recent finished runs by f1: run #7 (2a65fa28) f1=0.9105; all metrics {"accuracy": 0.9093, "f1": 0.9105, "precision": 0.901, "recall": 0.9202}.
+- Margin over the runner-up: 0.0.
 - Readiness verdict: meets all recorded readiness checks - still needs human promotion review.
-- Run 7c16875d (#5) trained on dataset data/dataset.csv.dvc md5 c5b96f9c373a3bfc9b42697f2dc328e6, version tag 'v2.0', recorded git commit 06510c01.
+- Run 2a65fa28 (#7) trained on dataset data/dataset.csv.dvc md5 c5b96f9c373a3bfc9b42697f2dc328e6, version tag 'v2.0', recorded git commit 06510c01.
 - That md5 was independently found in git history at commit 06510c01 (tags: ['v2.0']).
 - Current dataset data/dataset.csv.dvc: md5 c5b96f9c373a3bfc9b42697f2dc328e6, 105510 bytes, last changed in commit 06510c0 ('Dataset v2 (1500 rows)'), version tags ['v2.0'].
 - DVC status: Data and pipelines are up to date.
@@ -171,7 +171,7 @@ USER: Why did the training pipeline fail?
 **Known facts (from tool evidence)**
 - Airflow run manual__1: failed; tasks {'validate_dataset': 'failed', 'preprocess_data': 'upstream_failed', 'train_model': 'upstream_failed', 'evaluate_and_log_mlflow': 'upstream_failed', 'quality_gate': 'upstream_failed', 'promote_model': 'upstream_failed'}.
 - Failed tasks in manual__1: [{'task_id': 'validate_dataset', 'state': 'failed', 'try_number': 3, 'max_tries': 2}, {'task_id': 'preprocess_data', 'state': 'upstream_failed', 'try_number': 0, 'max_tries': 2}, {'task_id': 'train_model', 'state': 'upstream_failed', 'try_number': 0, 'max_tries': 2}, {'task_id': 'evaluate_and_log_mlflow', 'state': 'upstream_failed', 'try_number': 0, 'max_tries': 2}, {'task_id': 'quality_gate', 'state': 'upstream_failed', 'try_number': 0, 'max_tries': 2}, {'task_id': 'promote_model', 'state': 'upstream_failed', 'try_number': 0, 'max_tries': 2}]; root failure(s): ['validate_dataset'].
-- Task validate_dataset failed after try 3/2; error lines: ["ERROR dataset validation failed: null values found: {'f3': 375}", 'airflow.exceptions.AirflowFailException'].
+- Task validate_dataset failed on attempt 3 (retries configured: 2); error lines: ["ERROR dataset validation failed: null values found: {'f3': 375}", 'airflow.exceptions.AirflowFailException'].
 
 **Uncertainties**
 - (none)
@@ -252,16 +252,16 @@ USER: Compare the last 6 mlflow runs on f1 and explain why the pipeline failed.
 ## MLOps agent report
 
 **Known facts (from tool evidence)**
+- Run #7 (2a65fa28): f1=0.9105, params={'n_estimators': '400', 'max_depth': '14', 'random_state': '42'}, quality_gate=passed
 - Run #6 (d909525e): f1=0.6189, params={'n_estimators': '1', 'max_depth': '1', 'random_state': '42'}, quality_gate=failed
 - Run #5 (7c16875d): f1=0.9105, params={'n_estimators': '400', 'max_depth': '14', 'random_state': '42'}, quality_gate=passed
 - Run #4 (5b10b111): f1=0.8995, params={'n_estimators': '100', 'max_depth': '8', 'random_state': '42'}, quality_gate=passed
 - Run #3 (cfe2b994): f1=0.8170, params={'n_estimators': '50', 'max_depth': '4', 'random_state': '42'}, quality_gate=failed
 - Run #2 (87aae574): f1=0.8898, params={'n_estimators': '300', 'max_depth': '12', 'random_state': '42'}, quality_gate=passed
-- Run #1 (960d6ff5): f1=0.8537, params={'n_estimators': '100', 'max_depth': '8', 'random_state': '42'}, quality_gate=passed
-- Candidate by f1: 7c16875d (params that differ: ['max_depth', 'n_estimators']).
+- Candidate by f1: 2a65fa28 (params that differ: ['max_depth', 'n_estimators']).
 - Airflow run manual__1: failed; tasks {'validate_dataset': 'success', 'preprocess_data': 'success', 'train_model': 'success', 'evaluate_and_log_mlflow': 'success', 'quality_gate': 'failed', 'promote_model': 'upstream_failed'}.
 - Failed tasks in manual__1: [{'task_id': 'quality_gate', 'state': 'failed', 'try_number': 3, 'max_tries': 2}, {'task_id': 'promote_model', 'state': 'upstream_failed', 'try_number': 0, 'max_tries': 2}]; root failure(s): ['quality_gate'].
-- Task quality_gate failed after try 3/2; error lines: ['ERROR quality gate failed: f1=0.6189 < threshold 0.85. Promotion blocked.', 'airflow.exceptions.AirflowFailException'].
+- Task quality_gate failed on attempt 3 (retries configured: 2); error lines: ['ERROR quality gate failed: f1=0.6189 < threshold 0.85. Promotion blocked.', 'airflow.exceptions.AirflowFailException'].
 
 **Uncertainties**
 - The recommendation uses the recorded metric only. Readiness of the candidate: meets all recorded readiness checks - still needs human promotion review.
