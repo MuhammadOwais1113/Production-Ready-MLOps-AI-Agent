@@ -1,0 +1,1713 @@
+[
+  {
+    "title": "Scenario 1 - Dataset provenance",
+    "backends": "REAL: DVC, MLflow | MOCKED: Kubernetes, Airflow",
+    "question": "Which dataset version was used for experiment 4?",
+    "confirm": false,
+    "response": {
+      "request_id": "aa508ccd6e88",
+      "mode": "offline-planner",
+      "answer": "## MLOps agent report\n\n**Known facts (from tool evidence)**\n- Run 5b10b111 (#4) trained on dataset data/dataset.csv.dvc md5 c5b96f9c373a3bfc9b42697f2dc328e6, version tag 'v2.0', recorded git commit 06510c01.\n- That md5 was independently found in git history at commit 06510c01 (tags: ['v2.0']).\n\n**Uncertainties**\n- (none)\n\n**Recommended actions**\n- (none)",
+      "known_facts": [
+        "Run 5b10b111 (#4) trained on dataset data/dataset.csv.dvc md5 c5b96f9c373a3bfc9b42697f2dc328e6, version tag 'v2.0', recorded git commit 06510c01.",
+        "That md5 was independently found in git history at commit 06510c01 (tags: ['v2.0'])."
+      ],
+      "uncertainties": [],
+      "recommended_actions": [],
+      "evidence": [
+        {
+          "tool": "get_experiment_dataset",
+          "status": "ok",
+          "summary": "{\"run_id\": \"5b10b1119f8c4d92862d717b7c58ad2f\", \"run_number\": \"4\", \"provenance_recorded\": true, \"dvc_md5\": \"c5b96f9c373a3bfc9b42697f2dc328e6\", \"dvc_file\": \"data/dataset.csv.dvc\", \"recorded_git_commit\": \"06510c015fd27a0..."
+        }
+      ],
+      "tool_calls": [
+        {
+          "tool": "get_experiment_dataset",
+          "status": "ok",
+          "data": {
+            "run_id": "5b10b1119f8c4d92862d717b7c58ad2f",
+            "run_number": "4",
+            "provenance_recorded": true,
+            "dvc_md5": "c5b96f9c373a3bfc9b42697f2dc328e6",
+            "dvc_file": "data/dataset.csv.dvc",
+            "recorded_git_commit": "06510c015fd27a0f50956da6fb8106d3d8c62df6",
+            "recorded_dataset_version": "v2.0",
+            "verified_in_git": true,
+            "matching_commit": "06510c015fd27a0f50956da6fb8106d3d8c62df6",
+            "matching_tags": [
+              "v2.0"
+            ]
+          },
+          "error": null,
+          "duration_ms": 6275.85,
+          "request_id": "aa508ccd6e88"
+        }
+      ]
+    }
+  },
+  {
+    "title": "Scenario 1b - Dataset versions compared",
+    "backends": "REAL: DVC, MLflow | MOCKED: Kubernetes, Airflow",
+    "question": "Compare dataset versions v1.0 and v2.0",
+    "confirm": false,
+    "response": {
+      "request_id": "814bafec5ae1",
+      "mode": "offline-planner",
+      "answer": "## MLOps agent report\n\n**Known facts (from tool evidence)**\n- v1.0 md5 4725b62888d5b51df1db1713520729c2 vs v2.0 md5 c5b96f9c373a3bfc9b42697f2dc328e6: content DIFFERS; size delta 35393 bytes.\n\n**Uncertainties**\n- (none)\n\n**Recommended actions**\n- (none)",
+      "known_facts": [
+        "v1.0 md5 4725b62888d5b51df1db1713520729c2 vs v2.0 md5 c5b96f9c373a3bfc9b42697f2dc328e6: content DIFFERS; size delta 35393 bytes."
+      ],
+      "uncertainties": [],
+      "recommended_actions": [],
+      "evidence": [
+        {
+          "tool": "compare_dataset_versions",
+          "status": "ok",
+          "summary": "{\"dvc_file\": \"data/dataset.csv.dvc\", \"a\": {\"rev\": \"v1.0\", \"md5\": \"4725b62888d5b51df1db1713520729c2\", \"size\": 70117, \"nfiles\": null, \"path\": \"dataset.csv\", \"commit\": \"b50a8cf7b87d167690be647a672d76a5006ab9dc\", \"short\":..."
+        }
+      ],
+      "tool_calls": [
+        {
+          "tool": "compare_dataset_versions",
+          "status": "ok",
+          "data": {
+            "dvc_file": "data/dataset.csv.dvc",
+            "a": {
+              "rev": "v1.0",
+              "md5": "4725b62888d5b51df1db1713520729c2",
+              "size": 70117,
+              "nfiles": null,
+              "path": "dataset.csv",
+              "commit": "b50a8cf7b87d167690be647a672d76a5006ab9dc",
+              "short": "b50a8cf",
+              "subject": "Initial project: agent, tools, pipeline, k8s manifests, dataset v1",
+              "date": "2026-11-14 15:04:04 +0500"
+            },
+            "b": {
+              "rev": "v2.0",
+              "md5": "c5b96f9c373a3bfc9b42697f2dc328e6",
+              "size": 105510,
+              "nfiles": null,
+              "path": "dataset.csv",
+              "commit": "06510c015fd27a0f50956da6fb8106d3d8c62df6",
+              "short": "06510c0",
+              "subject": "Dataset v2 (1500 rows)",
+              "date": "2026-11-14 15:06:17 +0500"
+            },
+            "content_changed": true,
+            "size_delta_bytes": 35393
+          },
+          "error": null,
+          "duration_ms": 1267.37,
+          "request_id": "814bafec5ae1"
+        }
+      ]
+    }
+  },
+  {
+    "title": "Scenario 1c - Reproduce an old dataset (explanation)",
+    "backends": "REAL: DVC, MLflow | MOCKED: Kubernetes, Airflow",
+    "question": "Explain how to reproduce dataset version v1.0",
+    "confirm": false,
+    "response": {
+      "request_id": "ba1195b9413c",
+      "mode": "offline-planner",
+      "answer": "## MLOps agent report\n\n**Known facts (from tool evidence)**\n- Version v1.0 = md5 4725b62888d5b51df1db1713520729c2 (commit b50a8cf7).\n\n**Uncertainties**\n- (none)\n\n**Recommended actions**\n- git checkout v1.0 -- data/dataset.csv.dvc    # restore the dataset pointer recorded at that revision\n- dvc checkout data/dataset.csv.dvc    # materialise the exact file from the DVC cache\n- dvc pull    # only if the cache is empty: download from the configured DVC remote\n- verify: md5 of dataset.csv must equal 4725b62888d5b51df1db1713520729c2",
+      "known_facts": [
+        "Version v1.0 = md5 4725b62888d5b51df1db1713520729c2 (commit b50a8cf7)."
+      ],
+      "uncertainties": [],
+      "recommended_actions": [
+        "git checkout v1.0 -- data/dataset.csv.dvc    # restore the dataset pointer recorded at that revision",
+        "dvc checkout data/dataset.csv.dvc    # materialise the exact file from the DVC cache",
+        "dvc pull    # only if the cache is empty: download from the configured DVC remote",
+        "verify: md5 of dataset.csv must equal 4725b62888d5b51df1db1713520729c2"
+      ],
+      "evidence": [
+        {
+          "tool": "explain_dataset_reproduction",
+          "status": "ok",
+          "summary": "{\"rev\": \"v1.0\", \"dvc_file\": \"data/dataset.csv.dvc\", \"expected_md5\": \"4725b62888d5b51df1db1713520729c2\", \"git_commit\": \"b50a8cf7b87d167690be647a672d76a5006ab9dc\", \"steps\": [\"git checkout v1.0 -- data/dataset.csv.dvc   ..."
+        }
+      ],
+      "tool_calls": [
+        {
+          "tool": "explain_dataset_reproduction",
+          "status": "ok",
+          "data": {
+            "rev": "v1.0",
+            "dvc_file": "data/dataset.csv.dvc",
+            "expected_md5": "4725b62888d5b51df1db1713520729c2",
+            "git_commit": "b50a8cf7b87d167690be647a672d76a5006ab9dc",
+            "steps": [
+              "git checkout v1.0 -- data/dataset.csv.dvc    # restore the dataset pointer recorded at that revision",
+              "dvc checkout data/dataset.csv.dvc    # materialise the exact file from the DVC cache",
+              "dvc pull    # only if the cache is empty: download from the configured DVC remote",
+              "verify: md5 of dataset.csv must equal 4725b62888d5b51df1db1713520729c2"
+            ],
+            "note": "Read-only explanation; use checkout_dataset_version (needs confirmation) to execute."
+          },
+          "error": null,
+          "duration_ms": 1189.03,
+          "request_id": "ba1195b9413c"
+        }
+      ]
+    }
+  },
+  {
+    "title": "Scenario 2 - Model selection",
+    "backends": "REAL: DVC, MLflow | MOCKED: Kubernetes, Airflow",
+    "question": "Compare the last five training runs and recommend the best candidate based on F1 score.",
+    "confirm": false,
+    "response": {
+      "request_id": "7a456d110bfc",
+      "mode": "offline-planner",
+      "answer": "## MLOps agent report\n\n**Known facts (from tool evidence)**\n- Run #6 (d909525e): f1=0.6189, params={'n_estimators': '1', 'max_depth': '1', 'random_state': '42'}, quality_gate=failed\n- Run #5 (7c16875d): f1=0.9105, params={'n_estimators': '400', 'max_depth': '14', 'random_state': '42'}, quality_gate=passed\n- Run #4 (5b10b111): f1=0.8995, params={'n_estimators': '100', 'max_depth': '8', 'random_state': '42'}, quality_gate=passed\n- Run #3 (cfe2b994): f1=0.8170, params={'n_estimators': '50', 'max_depth': '4', 'random_state': '42'}, quality_gate=failed\n- Run #2 (87aae574): f1=0.8898, params={'n_estimators': '300', 'max_depth': '12', 'random_state': '42'}, quality_gate=passed\n- Candidate by f1: 7c16875d (params that differ: ['max_depth', 'n_estimators']).\n\n**Uncertainties**\n- The recommendation uses the recorded metric only. Readiness of the candidate: meets all recorded readiness checks - still needs human promotion review.\n\n**Recommended actions**\n- (none)",
+      "known_facts": [
+        "Run #6 (d909525e): f1=0.6189, params={'n_estimators': '1', 'max_depth': '1', 'random_state': '42'}, quality_gate=failed",
+        "Run #5 (7c16875d): f1=0.9105, params={'n_estimators': '400', 'max_depth': '14', 'random_state': '42'}, quality_gate=passed",
+        "Run #4 (5b10b111): f1=0.8995, params={'n_estimators': '100', 'max_depth': '8', 'random_state': '42'}, quality_gate=passed",
+        "Run #3 (cfe2b994): f1=0.8170, params={'n_estimators': '50', 'max_depth': '4', 'random_state': '42'}, quality_gate=failed",
+        "Run #2 (87aae574): f1=0.8898, params={'n_estimators': '300', 'max_depth': '12', 'random_state': '42'}, quality_gate=passed",
+        "Candidate by f1: 7c16875d (params that differ: ['max_depth', 'n_estimators'])."
+      ],
+      "uncertainties": [
+        "The recommendation uses the recorded metric only. Readiness of the candidate: meets all recorded readiness checks - still needs human promotion review."
+      ],
+      "recommended_actions": [],
+      "evidence": [
+        {
+          "tool": "compare_mlflow_runs",
+          "status": "ok",
+          "summary": "{\"metric\": \"f1\", \"runs\": [{\"run_id\": \"d909525ef100459f82ef76e640502269\", \"run_name\": \"rf-run-6\", \"run_number\": \"6\", \"status\": \"FINISHED\", \"start_time\": 1794650819436, \"metrics\": {\"accuracy\": 0.688, \"f1\": 0.61889250814..."
+        }
+      ],
+      "tool_calls": [
+        {
+          "tool": "compare_mlflow_runs",
+          "status": "ok",
+          "data": {
+            "metric": "f1",
+            "runs": [
+              {
+                "run_id": "d909525ef100459f82ef76e640502269",
+                "run_name": "rf-run-6",
+                "run_number": "6",
+                "status": "FINISHED",
+                "start_time": 1794650819436,
+                "metrics": {
+                  "accuracy": 0.688,
+                  "f1": 0.6188925081433225,
+                  "precision": 0.7983193277310925,
+                  "recall": 0.5053191489361702
+                },
+                "params": {
+                  "n_estimators": "1",
+                  "max_depth": "1",
+                  "random_state": "42"
+                },
+                "quality_gate": "failed",
+                "dvc_md5": "c5b96f9c373a3bfc9b42697f2dc328e6",
+                "dvc_version": "v2.0",
+                "git_commit": "06510c015fd27a0f50956da6fb8106d3d8c62df6",
+                "airflow_dag_run_id": null
+              },
+              {
+                "run_id": "7c16875de71c49ac923b02a0aed9d10b",
+                "run_name": "rf-run-5",
+                "run_number": "5",
+                "status": "FINISHED",
+                "start_time": 1794650806264,
+                "metrics": {
+                  "accuracy": 0.9093333333333333,
+                  "f1": 0.9105263157894737,
+                  "precision": 0.9010416666666666,
+                  "recall": 0.9202127659574468
+                },
+                "params": {
+                  "n_estimators": "400",
+                  "max_depth": "14",
+                  "random_state": "42"
+                },
+                "quality_gate": "passed",
+                "dvc_md5": "c5b96f9c373a3bfc9b42697f2dc328e6",
+                "dvc_version": "v2.0",
+                "git_commit": "06510c015fd27a0f50956da6fb8106d3d8c62df6",
+                "airflow_dag_run_id": null
+              },
+              {
+                "run_id": "5b10b1119f8c4d92862d717b7c58ad2f",
+                "run_name": "rf-run-4",
+                "run_number": "4",
+                "status": "FINISHED",
+                "start_time": 1794650790391,
+                "metrics": {
+                  "accuracy": 0.8986666666666666,
+                  "f1": 0.8994708994708994,
+                  "precision": 0.8947368421052632,
+                  "recall": 0.9042553191489362
+                },
+                "params": {
+                  "n_estimators": "100",
+                  "max_depth": "8",
+                  "random_state": "42"
+                },
+                "quality_gate": "passed",
+                "dvc_md5": "c5b96f9c373a3bfc9b42697f2dc328e6",
+                "dvc_version": "v2.0",
+                "git_commit": "06510c015fd27a0f50956da6fb8106d3d8c62df6",
+                "airflow_dag_run_id": null
+              },
+              {
+                "run_id": "cfe2b99487e14d20a8b6433a574df69e",
+                "run_name": "rf-run-3",
+                "run_number": "3",
+                "status": "FINISHED",
+                "start_time": 1794650760952,
+                "metrics": {
+                  "accuracy": 0.828,
+                  "f1": 0.8170212765957446,
+                  "precision": 0.8727272727272727,
+                  "recall": 0.768
+                },
+                "params": {
+                  "n_estimators": "50",
+                  "max_depth": "4",
+                  "random_state": "42"
+                },
+                "quality_gate": "failed",
+                "dvc_md5": "4725b62888d5b51df1db1713520729c2",
+                "dvc_version": "v1.0",
+                "git_commit": "b50a8cf7b87d167690be647a672d76a5006ab9dc",
+                "airflow_dag_run_id": null
+              },
+              {
+                "run_id": "87aae574aaf048a5886e004c6b6ee383",
+                "run_name": "rf-run-2",
+                "run_number": "2",
+                "status": "FINISHED",
+                "start_time": 1794650747844,
+                "metrics": {
+                  "accuracy": 0.892,
+                  "f1": 0.889795918367347,
+                  "precision": 0.9083333333333333,
+                  "recall": 0.872
+                },
+                "params": {
+                  "n_estimators": "300",
+                  "max_depth": "12",
+                  "random_state": "42"
+                },
+                "quality_gate": "passed",
+                "dvc_md5": "4725b62888d5b51df1db1713520729c2",
+                "dvc_version": "v1.0",
+                "git_commit": "b50a8cf7b87d167690be647a672d76a5006ab9dc",
+                "airflow_dag_run_id": null
+              }
+            ],
+            "ranking": [
+              "7c16875de71c49ac923b02a0aed9d10b",
+              "5b10b1119f8c4d92862d717b7c58ad2f",
+              "87aae574aaf048a5886e004c6b6ee383",
+              "cfe2b99487e14d20a8b6433a574df69e",
+              "d909525ef100459f82ef76e640502269"
+            ],
+            "params_that_differ": [
+              "max_depth",
+              "n_estimators"
+            ],
+            "recommended": "7c16875de71c49ac923b02a0aed9d10b",
+            "readiness": {
+              "checks": [
+                {
+                  "check": "quality_gate_passed",
+                  "ok": true,
+                  "detail": "passed"
+                },
+                {
+                  "check": "f1>=0.85",
+                  "ok": true,
+                  "detail": "f1=0.9105"
+                },
+                {
+                  "check": "dataset_provenance_recorded",
+                  "ok": true,
+                  "detail": "c5b96f9c373a3bfc9b42697f2dc328e6"
+                },
+                {
+                  "check": "registered_in_model_registry",
+                  "ok": true,
+                  "detail": "registered"
+                },
+                {
+                  "check": "fresh(<=30d)",
+                  "ok": true,
+                  "detail": "0.0 days old"
+                }
+              ],
+              "age_days": 0.01,
+              "verdict": "meets all recorded readiness checks - still needs human promotion review"
+            },
+            "caveat": "Recommendation is by the recorded metric only; check readiness before promotion."
+          },
+          "error": null,
+          "duration_ms": 86.88,
+          "request_id": "7a456d110bfc"
+        }
+      ]
+    }
+  },
+  {
+    "title": "Scenario 3a - Pipeline trigger without confirmation (safety)",
+    "backends": "REAL: DVC, MLflow | MOCKED: Kubernetes, Airflow",
+    "question": "Trigger the model training pipeline and report whether execution succeeded.",
+    "confirm": false,
+    "response": {
+      "request_id": "84e14c2bc784",
+      "mode": "offline-planner",
+      "answer": "## MLOps agent report\n\n**Known facts (from tool evidence)**\n- (none)\n\n**Uncertainties**\n- `trigger_training_dag` needs your confirmation: 'trigger_training_dag' changes system state. Ask the user to explicitly confirm (re-send the request with confirm=true).. No claims are made about this part.\n\n**Recommended actions**\n- Re-send the same request with confirm=true if you really want this state-changing action.",
+      "known_facts": [],
+      "uncertainties": [
+        "`trigger_training_dag` needs your confirmation: 'trigger_training_dag' changes system state. Ask the user to explicitly confirm (re-send the request with confirm=true).. No claims are made about this part."
+      ],
+      "recommended_actions": [
+        "Re-send the same request with confirm=true if you really want this state-changing action."
+      ],
+      "evidence": [
+        {
+          "tool": "trigger_training_dag",
+          "status": "needs_confirmation",
+          "summary": "needs_confirmation: 'trigger_training_dag' changes system state. Ask the user to explicitly confirm (re-send the request with confirm=true)."
+        }
+      ],
+      "tool_calls": [
+        {
+          "tool": "trigger_training_dag",
+          "status": "needs_confirmation",
+          "data": null,
+          "error": "'trigger_training_dag' changes system state. Ask the user to explicitly confirm (re-send the request with confirm=true).",
+          "duration_ms": 0.01,
+          "request_id": "84e14c2bc784"
+        }
+      ]
+    }
+  },
+  {
+    "title": "Scenario 3b - Pipeline execution (confirmed)",
+    "backends": "REAL: DVC, MLflow | MOCKED: Kubernetes, Airflow",
+    "question": "Trigger the model training pipeline and report whether execution succeeded.",
+    "confirm": true,
+    "response": {
+      "request_id": "ecb2efec9585",
+      "mode": "offline-planner",
+      "answer": "## MLOps agent report\n\n**Known facts (from tool evidence)**\n- trigger_training_dag executed: {'triggered': True, 'dag_run_id': 'manual__new', 'state': 'queued', 'run_type': 'manual', 'logical_date': None, 'start_date': None, 'end_date': None, 'conf': None}\n\n**Uncertainties**\n- (none)\n\n**Recommended actions**\n- (none)",
+      "known_facts": [
+        "trigger_training_dag executed: {'triggered': True, 'dag_run_id': 'manual__new', 'state': 'queued', 'run_type': 'manual', 'logical_date': None, 'start_date': None, 'end_date': None, 'conf': None}"
+      ],
+      "uncertainties": [],
+      "recommended_actions": [],
+      "evidence": [
+        {
+          "tool": "trigger_training_dag",
+          "status": "ok",
+          "summary": "{\"triggered\": true, \"dag_run_id\": \"manual__new\", \"state\": \"queued\", \"run_type\": \"manual\", \"logical_date\": null, \"start_date\": null, \"end_date\": null, \"conf\": null}"
+        }
+      ],
+      "tool_calls": [
+        {
+          "tool": "trigger_training_dag",
+          "status": "ok",
+          "data": {
+            "triggered": true,
+            "dag_run_id": "manual__new",
+            "state": "queued",
+            "run_type": "manual",
+            "logical_date": null,
+            "start_date": null,
+            "end_date": null,
+            "conf": null
+          },
+          "error": null,
+          "duration_ms": 0.2,
+          "request_id": "ecb2efec9585"
+        }
+      ]
+    }
+  },
+  {
+    "title": "Scenario 3c - Pipeline status",
+    "backends": "REAL: DVC, MLflow | MOCKED: Kubernetes, Airflow",
+    "question": "What is the status of the training pipeline DAG runs?",
+    "confirm": false,
+    "response": {
+      "request_id": "e533dbceb257",
+      "mode": "offline-planner",
+      "answer": "## MLOps agent report\n\n**Known facts (from tool evidence)**\n- Airflow run manual__1: success; tasks {'validate_dataset': 'success', 'preprocess_data': 'success', 'train_model': 'success', 'evaluate_and_log_mlflow': 'success', 'quality_gate': 'success', 'promote_model': 'success'}.\n\n**Uncertainties**\n- (none)\n\n**Recommended actions**\n- (none)",
+      "known_facts": [
+        "Airflow run manual__1: success; tasks {'validate_dataset': 'success', 'preprocess_data': 'success', 'train_model': 'success', 'evaluate_and_log_mlflow': 'success', 'quality_gate': 'success', 'promote_model': 'success'}."
+      ],
+      "uncertainties": [],
+      "recommended_actions": [],
+      "evidence": [
+        {
+          "tool": "get_dag_run_status",
+          "status": "ok",
+          "summary": "{\"dag_id\": \"training_pipeline\", \"runs\": [{\"dag_run_id\": \"manual__1\", \"state\": \"success\", \"run_type\": \"manual\", \"logical_date\": null, \"start_date\": null, \"end_date\": null, \"conf\": null, \"tasks\": {\"validate_dataset\": \"s..."
+        }
+      ],
+      "tool_calls": [
+        {
+          "tool": "get_dag_run_status",
+          "status": "ok",
+          "data": {
+            "dag_id": "training_pipeline",
+            "runs": [
+              {
+                "dag_run_id": "manual__1",
+                "state": "success",
+                "run_type": "manual",
+                "logical_date": null,
+                "start_date": null,
+                "end_date": null,
+                "conf": null,
+                "tasks": {
+                  "validate_dataset": "success",
+                  "preprocess_data": "success",
+                  "train_model": "success",
+                  "evaluate_and_log_mlflow": "success",
+                  "quality_gate": "success",
+                  "promote_model": "success"
+                }
+              }
+            ]
+          },
+          "error": null,
+          "duration_ms": 0.22,
+          "request_id": "e533dbceb257"
+        }
+      ]
+    }
+  },
+  {
+    "title": "Scenario 4 - Deployment health",
+    "backends": "REAL: DVC, MLflow | MOCKED: Kubernetes, Airflow",
+    "question": "Check the deployment status in Kubernetes",
+    "confirm": false,
+    "response": {
+      "request_id": "dc03c57c19b9",
+      "mode": "offline-planner",
+      "answer": "## MLOps agent report\n\n**Known facts (from tool evidence)**\n- Deployment inference-api: desired 2, ready 2, available 2.\n- Pods: inference-api-6d9f-abcde[Running, ready=True, restarts=0], inference-api-6d9f-fghij[Running, ready=True, restarts=0]\n- All 2 pods are healthy (no crash loops, pull errors or unready containers).\n\n**Uncertainties**\n- (none)\n\n**Recommended actions**\n- (none)",
+      "known_facts": [
+        "Deployment inference-api: desired 2, ready 2, available 2.",
+        "Pods: inference-api-6d9f-abcde[Running, ready=True, restarts=0], inference-api-6d9f-fghij[Running, ready=True, restarts=0]",
+        "All 2 pods are healthy (no crash loops, pull errors or unready containers)."
+      ],
+      "uncertainties": [],
+      "recommended_actions": [],
+      "evidence": [
+        {
+          "tool": "list_k8s_workloads",
+          "status": "ok",
+          "summary": "{\"namespace\": \"mlops-agent\", \"deployments\": [{\"name\": \"inference-api\", \"desired\": 2, \"ready\": 2, \"available\": 2, \"updated\": 2}], \"pods\": [{\"name\": \"inference-api-6d9f-abcde\", \"phase\": \"Running\", \"ready\": true, \"restar..."
+        },
+        {
+          "tool": "find_unhealthy_pods",
+          "status": "ok",
+          "summary": "{\"namespace\": \"mlops-agent\", \"total_pods\": 2, \"unhealthy\": [], \"healthy_count\": 2}"
+        }
+      ],
+      "tool_calls": [
+        {
+          "tool": "list_k8s_workloads",
+          "status": "ok",
+          "data": {
+            "namespace": "mlops-agent",
+            "deployments": [
+              {
+                "name": "inference-api",
+                "desired": 2,
+                "ready": 2,
+                "available": 2,
+                "updated": 2
+              }
+            ],
+            "pods": [
+              {
+                "name": "inference-api-6d9f-abcde",
+                "phase": "Running",
+                "ready": true,
+                "restarts": 0
+              },
+              {
+                "name": "inference-api-6d9f-fghij",
+                "phase": "Running",
+                "ready": true,
+                "restarts": 0
+              }
+            ]
+          },
+          "error": null,
+          "duration_ms": 0.2,
+          "request_id": "dc03c57c19b9"
+        },
+        {
+          "tool": "find_unhealthy_pods",
+          "status": "ok",
+          "data": {
+            "namespace": "mlops-agent",
+            "total_pods": 2,
+            "unhealthy": [],
+            "healthy_count": 2
+          },
+          "error": null,
+          "duration_ms": 0.13,
+          "request_id": "dc03c57c19b9"
+        }
+      ]
+    }
+  },
+  {
+    "title": "Scenario 5 - Multi-tool reasoning",
+    "backends": "REAL: DVC, MLflow | MOCKED: Kubernetes, Airflow",
+    "question": "Find the best recent model, identify the dataset version used to train it, check the deployment status, and explain whether retraining is necessary.",
+    "confirm": false,
+    "response": {
+      "request_id": "55549d35b3fb",
+      "mode": "offline-planner",
+      "answer": "## Model health & retraining review\n\n**Known facts (from tool evidence)**\n- Best of the 6 most recent finished runs by f1: run #5 (7c16875d) f1=0.9105; all metrics {\"accuracy\": 0.9093, \"f1\": 0.9105, \"precision\": 0.901, \"recall\": 0.9202}.\n- Margin over the runner-up: 0.011055.\n- Readiness verdict: meets all recorded readiness checks - still needs human promotion review.\n- Run 7c16875d (#5) trained on dataset data/dataset.csv.dvc md5 c5b96f9c373a3bfc9b42697f2dc328e6, version tag 'v2.0', recorded git commit 06510c01.\n- That md5 was independently found in git history at commit 06510c01 (tags: ['v2.0']).\n- Current dataset data/dataset.csv.dvc: md5 c5b96f9c373a3bfc9b42697f2dc328e6, 105510 bytes, last changed in commit 06510c0 ('Dataset v2 (1500 rows)'), version tags ['v2.0'].\n- DVC status: Data and pipelines are up to date.\n- Deployment inference-api: images ['mlops-inference:1.0.0'], version label 1.0.0, 2/2 replicas ready.\n- All 2 pods are healthy (no crash loops, pull errors or unready containers).\n- Airflow run manual__1: success; tasks {'validate_dataset': 'success', 'preprocess_data': 'success', 'train_model': 'success', 'evaluate_and_log_mlflow': 'success', 'quality_gate': 'success', 'promote_model': 'success'}.\n- No failed tasks in run manual__1 (state success).\n- The best model was trained on the CURRENT dataset version.\n\n**Uncertainties**\n- Live production performance/drift data was not provided, so degradation in production cannot be ruled out.\n\n**Recommended actions**\n- Retraining is NOT currently necessary: no freshness-policy breach, failed quality gate or supplied degradation results were found in the evidence.",
+      "known_facts": [
+        "Best of the 6 most recent finished runs by f1: run #5 (7c16875d) f1=0.9105; all metrics {\"accuracy\": 0.9093, \"f1\": 0.9105, \"precision\": 0.901, \"recall\": 0.9202}.",
+        "Margin over the runner-up: 0.011055.",
+        "Readiness verdict: meets all recorded readiness checks - still needs human promotion review.",
+        "Run 7c16875d (#5) trained on dataset data/dataset.csv.dvc md5 c5b96f9c373a3bfc9b42697f2dc328e6, version tag 'v2.0', recorded git commit 06510c01.",
+        "That md5 was independently found in git history at commit 06510c01 (tags: ['v2.0']).",
+        "Current dataset data/dataset.csv.dvc: md5 c5b96f9c373a3bfc9b42697f2dc328e6, 105510 bytes, last changed in commit 06510c0 ('Dataset v2 (1500 rows)'), version tags ['v2.0'].",
+        "DVC status: Data and pipelines are up to date.",
+        "Deployment inference-api: images ['mlops-inference:1.0.0'], version label 1.0.0, 2/2 replicas ready.",
+        "All 2 pods are healthy (no crash loops, pull errors or unready containers).",
+        "Airflow run manual__1: success; tasks {'validate_dataset': 'success', 'preprocess_data': 'success', 'train_model': 'success', 'evaluate_and_log_mlflow': 'success', 'quality_gate': 'success', 'promote_model': 'success'}.",
+        "No failed tasks in run manual__1 (state success).",
+        "The best model was trained on the CURRENT dataset version."
+      ],
+      "uncertainties": [
+        "Live production performance/drift data was not provided, so degradation in production cannot be ruled out."
+      ],
+      "recommended_actions": [
+        "Retraining is NOT currently necessary: no freshness-policy breach, failed quality gate or supplied degradation results were found in the evidence."
+      ],
+      "evidence": [
+        {
+          "tool": "find_best_mlflow_run",
+          "status": "ok",
+          "summary": "{\"metric\": \"f1\", \"direction\": \"max\", \"runs_considered\": 6, \"best\": {\"run_id\": \"7c16875de71c49ac923b02a0aed9d10b\", \"run_name\": \"rf-run-5\", \"run_number\": \"5\", \"status\": \"FINISHED\", \"start_time\": 1794650806264, \"metrics\"..."
+        },
+        {
+          "tool": "get_experiment_dataset",
+          "status": "ok",
+          "summary": "{\"run_id\": \"7c16875de71c49ac923b02a0aed9d10b\", \"run_number\": \"5\", \"provenance_recorded\": true, \"dvc_md5\": \"c5b96f9c373a3bfc9b42697f2dc328e6\", \"dvc_file\": \"data/dataset.csv.dvc\", \"recorded_git_commit\": \"06510c015fd27a0..."
+        },
+        {
+          "tool": "get_dataset_version",
+          "status": "ok",
+          "summary": "{\"dvc_file\": \"data/dataset.csv.dvc\", \"md5\": \"c5b96f9c373a3bfc9b42697f2dc328e6\", \"size\": 105510, \"nfiles\": null, \"path\": \"dataset.csv\", \"git_commit\": \"06510c015fd27a0f50956da6fb8106d3d8c62df6\", \"git_commit_short\": \"065..."
+        },
+        {
+          "tool": "detect_data_changes",
+          "status": "ok",
+          "summary": "{\"changed\": false, \"details\": {}, \"summary\": \"Data and pipelines are up to date\"}"
+        },
+        {
+          "tool": "get_deployed_version",
+          "status": "ok",
+          "summary": "{\"namespace\": \"mlops-agent\", \"deployments\": [{\"deployment\": \"inference-api\", \"images\": [\"mlops-inference:1.0.0\"], \"image_tags\": [\"1.0.0\"], \"app_version_label\": \"1.0.0\", \"generation\": 3, \"observed_generation\": 3, \"desi..."
+        },
+        {
+          "tool": "find_unhealthy_pods",
+          "status": "ok",
+          "summary": "{\"namespace\": \"mlops-agent\", \"total_pods\": 2, \"unhealthy\": [], \"healthy_count\": 2}"
+        },
+        {
+          "tool": "get_dag_run_status",
+          "status": "ok",
+          "summary": "{\"dag_id\": \"training_pipeline\", \"runs\": [{\"dag_run_id\": \"manual__1\", \"state\": \"success\", \"run_type\": \"manual\", \"logical_date\": null, \"start_date\": null, \"end_date\": null, \"conf\": null, \"tasks\": {\"validate_dataset\": \"s..."
+        },
+        {
+          "tool": "get_failed_tasks",
+          "status": "ok",
+          "summary": "{\"dag_run_id\": \"manual__1\", \"run_state\": \"success\", \"failed_tasks\": [], \"root_failures\": []}"
+        }
+      ],
+      "tool_calls": [
+        {
+          "tool": "find_best_mlflow_run",
+          "status": "ok",
+          "data": {
+            "metric": "f1",
+            "direction": "max",
+            "runs_considered": 6,
+            "best": {
+              "run_id": "7c16875de71c49ac923b02a0aed9d10b",
+              "run_name": "rf-run-5",
+              "run_number": "5",
+              "status": "FINISHED",
+              "start_time": 1794650806264,
+              "metrics": {
+                "accuracy": 0.9093333333333333,
+                "f1": 0.9105263157894737,
+                "precision": 0.9010416666666666,
+                "recall": 0.9202127659574468
+              },
+              "params": {
+                "n_estimators": "400",
+                "max_depth": "14",
+                "random_state": "42"
+              },
+              "quality_gate": "passed",
+              "dvc_md5": "c5b96f9c373a3bfc9b42697f2dc328e6",
+              "dvc_version": "v2.0",
+              "git_commit": "06510c015fd27a0f50956da6fb8106d3d8c62df6",
+              "airflow_dag_run_id": null
+            },
+            "runner_up_margin": 0.011055,
+            "readiness": {
+              "checks": [
+                {
+                  "check": "quality_gate_passed",
+                  "ok": true,
+                  "detail": "passed"
+                },
+                {
+                  "check": "f1>=0.85",
+                  "ok": true,
+                  "detail": "f1=0.9105"
+                },
+                {
+                  "check": "dataset_provenance_recorded",
+                  "ok": true,
+                  "detail": "c5b96f9c373a3bfc9b42697f2dc328e6"
+                },
+                {
+                  "check": "registered_in_model_registry",
+                  "ok": true,
+                  "detail": "registered"
+                },
+                {
+                  "check": "fresh(<=30d)",
+                  "ok": true,
+                  "detail": "0.0 days old"
+                }
+              ],
+              "age_days": 0.01,
+              "verdict": "meets all recorded readiness checks - still needs human promotion review"
+            },
+            "caveat": "Highest metric does not imply production-readiness; see readiness checks."
+          },
+          "error": null,
+          "duration_ms": 44.17,
+          "request_id": "55549d35b3fb"
+        },
+        {
+          "tool": "get_experiment_dataset",
+          "status": "ok",
+          "data": {
+            "run_id": "7c16875de71c49ac923b02a0aed9d10b",
+            "run_number": "5",
+            "provenance_recorded": true,
+            "dvc_md5": "c5b96f9c373a3bfc9b42697f2dc328e6",
+            "dvc_file": "data/dataset.csv.dvc",
+            "recorded_git_commit": "06510c015fd27a0f50956da6fb8106d3d8c62df6",
+            "recorded_dataset_version": "v2.0",
+            "verified_in_git": true,
+            "matching_commit": "06510c015fd27a0f50956da6fb8106d3d8c62df6",
+            "matching_tags": [
+              "v2.0"
+            ]
+          },
+          "error": null,
+          "duration_ms": 153.46,
+          "request_id": "55549d35b3fb"
+        },
+        {
+          "tool": "get_dataset_version",
+          "status": "ok",
+          "data": {
+            "dvc_file": "data/dataset.csv.dvc",
+            "md5": "c5b96f9c373a3bfc9b42697f2dc328e6",
+            "size": 105510,
+            "nfiles": null,
+            "path": "dataset.csv",
+            "git_commit": "06510c015fd27a0f50956da6fb8106d3d8c62df6",
+            "git_commit_short": "06510c0",
+            "commit_message": "Dataset v2 (1500 rows)",
+            "commit_date": "2026-11-14 15:06:17 +0500",
+            "version_tags": [
+              "v2.0"
+            ],
+            "head": "06510c015fd27a0f50956da6fb8106d3d8c62df6"
+          },
+          "error": null,
+          "duration_ms": 1325.45,
+          "request_id": "55549d35b3fb"
+        },
+        {
+          "tool": "detect_data_changes",
+          "status": "ok",
+          "data": {
+            "changed": false,
+            "details": {},
+            "summary": "Data and pipelines are up to date"
+          },
+          "error": null,
+          "duration_ms": 3782.49,
+          "request_id": "55549d35b3fb"
+        },
+        {
+          "tool": "get_deployed_version",
+          "status": "ok",
+          "data": {
+            "namespace": "mlops-agent",
+            "deployments": [
+              {
+                "deployment": "inference-api",
+                "images": [
+                  "mlops-inference:1.0.0"
+                ],
+                "image_tags": [
+                  "1.0.0"
+                ],
+                "app_version_label": "1.0.0",
+                "generation": 3,
+                "observed_generation": 3,
+                "desired": 2,
+                "ready": 2
+              }
+            ]
+          },
+          "error": null,
+          "duration_ms": 0.32,
+          "request_id": "55549d35b3fb"
+        },
+        {
+          "tool": "find_unhealthy_pods",
+          "status": "ok",
+          "data": {
+            "namespace": "mlops-agent",
+            "total_pods": 2,
+            "unhealthy": [],
+            "healthy_count": 2
+          },
+          "error": null,
+          "duration_ms": 0.14,
+          "request_id": "55549d35b3fb"
+        },
+        {
+          "tool": "get_dag_run_status",
+          "status": "ok",
+          "data": {
+            "dag_id": "training_pipeline",
+            "runs": [
+              {
+                "dag_run_id": "manual__1",
+                "state": "success",
+                "run_type": "manual",
+                "logical_date": null,
+                "start_date": null,
+                "end_date": null,
+                "conf": null,
+                "tasks": {
+                  "validate_dataset": "success",
+                  "preprocess_data": "success",
+                  "train_model": "success",
+                  "evaluate_and_log_mlflow": "success",
+                  "quality_gate": "success",
+                  "promote_model": "success"
+                }
+              }
+            ]
+          },
+          "error": null,
+          "duration_ms": 0.17,
+          "request_id": "55549d35b3fb"
+        },
+        {
+          "tool": "get_failed_tasks",
+          "status": "ok",
+          "data": {
+            "dag_run_id": "manual__1",
+            "run_state": "success",
+            "failed_tasks": [],
+            "root_failures": []
+          },
+          "error": null,
+          "duration_ms": 0.14,
+          "request_id": "55549d35b3fb"
+        }
+      ]
+    }
+  },
+  {
+    "title": "Failure 1a - Has the data changed?",
+    "backends": "REAL: DVC, MLflow | MOCKED: Kubernetes, Airflow",
+    "question": "Has the tracked dataset changed since it was versioned?",
+    "confirm": false,
+    "response": {
+      "request_id": "5b44eca57fac",
+      "mode": "offline-planner",
+      "answer": "## MLOps agent report\n\n**Known facts (from tool evidence)**\n- DVC status: Tracked data differs from its recorded DVC hash - {'data\\\\dataset.csv.dvc': [{'changed outs': {'data\\\\dataset.csv': 'modified'}}]}\n\n**Uncertainties**\n- (none)\n\n**Recommended actions**\n- Tracked data was modified outside DVC: restore it with `dvc checkout` or record it as a new version (`dvc add` + git commit).",
+      "known_facts": [
+        "DVC status: Tracked data differs from its recorded DVC hash - {'data\\\\dataset.csv.dvc': [{'changed outs': {'data\\\\dataset.csv': 'modified'}}]}"
+      ],
+      "uncertainties": [],
+      "recommended_actions": [
+        "Tracked data was modified outside DVC: restore it with `dvc checkout` or record it as a new version (`dvc add` + git commit)."
+      ],
+      "evidence": [
+        {
+          "tool": "detect_data_changes",
+          "status": "ok",
+          "summary": "{\"changed\": true, \"details\": {\"data\\\\dataset.csv.dvc\": [{\"changed outs\": {\"data\\\\dataset.csv\": \"modified\"}}]}, \"summary\": \"Tracked data differs from its recorded DVC hash\"}"
+        }
+      ],
+      "tool_calls": [
+        {
+          "tool": "detect_data_changes",
+          "status": "ok",
+          "data": {
+            "changed": true,
+            "details": {
+              "data\\dataset.csv.dvc": [
+                {
+                  "changed outs": {
+                    "data\\dataset.csv": "modified"
+                  }
+                }
+              ]
+            },
+            "summary": "Tracked data differs from its recorded DVC hash"
+          },
+          "error": null,
+          "duration_ms": 3501.21,
+          "request_id": "5b44eca57fac"
+        }
+      ]
+    }
+  },
+  {
+    "title": "Failure 1 - real validate() output",
+    "backends": "REAL pipeline code",
+    "question": "(direct call) validate()",
+    "confirm": false,
+    "response": {
+      "answer": "DataValidationError: null values found: {'f3': 375}",
+      "tool_calls": []
+    }
+  },
+  {
+    "title": "Failure 1b - Why did the pipeline fail? (Airflow logs: scripted replica of this failure)",
+    "backends": "REAL: DVC, MLflow | MOCKED: Kubernetes, Airflow",
+    "question": "Why did the training pipeline fail?",
+    "confirm": false,
+    "response": {
+      "request_id": "37998cc92f27",
+      "mode": "offline-planner",
+      "answer": "## MLOps agent report\n\n**Known facts (from tool evidence)**\n- Airflow run manual__1: failed; tasks {'validate_dataset': 'failed', 'preprocess_data': 'upstream_failed', 'train_model': 'upstream_failed', 'evaluate_and_log_mlflow': 'upstream_failed', 'quality_gate': 'upstream_failed', 'promote_model': 'upstream_failed'}.\n- Failed tasks in manual__1: [{'task_id': 'validate_dataset', 'state': 'failed', 'try_number': 3, 'max_tries': 2}, {'task_id': 'preprocess_data', 'state': 'upstream_failed', 'try_number': 0, 'max_tries': 2}, {'task_id': 'train_model', 'state': 'upstream_failed', 'try_number': 0, 'max_tries': 2}, {'task_id': 'evaluate_and_log_mlflow', 'state': 'upstream_failed', 'try_number': 0, 'max_tries': 2}, {'task_id': 'quality_gate', 'state': 'upstream_failed', 'try_number': 0, 'max_tries': 2}, {'task_id': 'promote_model', 'state': 'upstream_failed', 'try_number': 0, 'max_tries': 2}]; root failure(s): ['validate_dataset'].\n- Task validate_dataset failed after try 3/2; error lines: [\"ERROR dataset validation failed: null values found: {'f3': 375}\", 'airflow.exceptions.AirflowFailException'].\n\n**Uncertainties**\n- (none)\n\n**Recommended actions**\n- Fix the cause shown in the validate_dataset log, then re-run the pipeline (needs your confirmation).",
+      "known_facts": [
+        "Airflow run manual__1: failed; tasks {'validate_dataset': 'failed', 'preprocess_data': 'upstream_failed', 'train_model': 'upstream_failed', 'evaluate_and_log_mlflow': 'upstream_failed', 'quality_gate': 'upstream_failed', 'promote_model': 'upstream_failed'}.",
+        "Failed tasks in manual__1: [{'task_id': 'validate_dataset', 'state': 'failed', 'try_number': 3, 'max_tries': 2}, {'task_id': 'preprocess_data', 'state': 'upstream_failed', 'try_number': 0, 'max_tries': 2}, {'task_id': 'train_model', 'state': 'upstream_failed', 'try_number': 0, 'max_tries': 2}, {'task_id': 'evaluate_and_log_mlflow', 'state': 'upstream_failed', 'try_number': 0, 'max_tries': 2}, {'task_id': 'quality_gate', 'state': 'upstream_failed', 'try_number': 0, 'max_tries': 2}, {'task_id': 'promote_model', 'state': 'upstream_failed', 'try_number': 0, 'max_tries': 2}]; root failure(s): ['validate_dataset'].",
+        "Task validate_dataset failed after try 3/2; error lines: [\"ERROR dataset validation failed: null values found: {'f3': 375}\", 'airflow.exceptions.AirflowFailException']."
+      ],
+      "uncertainties": [],
+      "recommended_actions": [
+        "Fix the cause shown in the validate_dataset log, then re-run the pipeline (needs your confirmation)."
+      ],
+      "evidence": [
+        {
+          "tool": "get_dag_run_status",
+          "status": "ok",
+          "summary": "{\"dag_id\": \"training_pipeline\", \"runs\": [{\"dag_run_id\": \"manual__1\", \"state\": \"failed\", \"run_type\": \"manual\", \"logical_date\": null, \"start_date\": null, \"end_date\": null, \"conf\": null, \"tasks\": {\"validate_dataset\": \"fa..."
+        },
+        {
+          "tool": "get_failed_tasks",
+          "status": "ok",
+          "summary": "{\"dag_run_id\": \"manual__1\", \"run_state\": \"failed\", \"failed_tasks\": [{\"task_id\": \"validate_dataset\", \"state\": \"failed\", \"try_number\": 3, \"max_tries\": 2}, {\"task_id\": \"preprocess_data\", \"state\": \"upstream_failed\", \"try_..."
+        },
+        {
+          "tool": "get_task_diagnostics",
+          "status": "ok",
+          "summary": "{\"dag_run_id\": \"manual__1\", \"task_id\": \"validate_dataset\", \"state\": \"failed\", \"try_number\": 3, \"max_tries\": 2, \"start_date\": null, \"end_date\": null, \"duration\": null, \"error_lines\": [\"ERROR dataset validation failed: ..."
+        }
+      ],
+      "tool_calls": [
+        {
+          "tool": "get_dag_run_status",
+          "status": "ok",
+          "data": {
+            "dag_id": "training_pipeline",
+            "runs": [
+              {
+                "dag_run_id": "manual__1",
+                "state": "failed",
+                "run_type": "manual",
+                "logical_date": null,
+                "start_date": null,
+                "end_date": null,
+                "conf": null,
+                "tasks": {
+                  "validate_dataset": "failed",
+                  "preprocess_data": "upstream_failed",
+                  "train_model": "upstream_failed",
+                  "evaluate_and_log_mlflow": "upstream_failed",
+                  "quality_gate": "upstream_failed",
+                  "promote_model": "upstream_failed"
+                }
+              }
+            ]
+          },
+          "error": null,
+          "duration_ms": 0.33,
+          "request_id": "37998cc92f27"
+        },
+        {
+          "tool": "get_failed_tasks",
+          "status": "ok",
+          "data": {
+            "dag_run_id": "manual__1",
+            "run_state": "failed",
+            "failed_tasks": [
+              {
+                "task_id": "validate_dataset",
+                "state": "failed",
+                "try_number": 3,
+                "max_tries": 2
+              },
+              {
+                "task_id": "preprocess_data",
+                "state": "upstream_failed",
+                "try_number": 0,
+                "max_tries": 2
+              },
+              {
+                "task_id": "train_model",
+                "state": "upstream_failed",
+                "try_number": 0,
+                "max_tries": 2
+              },
+              {
+                "task_id": "evaluate_and_log_mlflow",
+                "state": "upstream_failed",
+                "try_number": 0,
+                "max_tries": 2
+              },
+              {
+                "task_id": "quality_gate",
+                "state": "upstream_failed",
+                "try_number": 0,
+                "max_tries": 2
+              },
+              {
+                "task_id": "promote_model",
+                "state": "upstream_failed",
+                "try_number": 0,
+                "max_tries": 2
+              }
+            ],
+            "root_failures": [
+              "validate_dataset"
+            ]
+          },
+          "error": null,
+          "duration_ms": 0.18,
+          "request_id": "37998cc92f27"
+        },
+        {
+          "tool": "get_task_diagnostics",
+          "status": "ok",
+          "data": {
+            "dag_run_id": "manual__1",
+            "task_id": "validate_dataset",
+            "state": "failed",
+            "try_number": 3,
+            "max_tries": 2,
+            "start_date": null,
+            "end_date": null,
+            "duration": null,
+            "error_lines": [
+              "ERROR dataset validation failed: null values found: {'f3': 375}",
+              "airflow.exceptions.AirflowFailException"
+            ],
+            "log_tail": [
+              "INFO starting",
+              "ERROR dataset validation failed: null values found: {'f3': 375}",
+              "airflow.exceptions.AirflowFailException"
+            ]
+          },
+          "error": null,
+          "duration_ms": 0.23,
+          "request_id": "37998cc92f27"
+        }
+      ]
+    }
+  },
+  {
+    "title": "Failure 1c - Resolve: restore the versioned data (needs confirm)",
+    "backends": "REAL: DVC, MLflow | MOCKED: Kubernetes, Airflow",
+    "question": "Restore dataset version v2.0",
+    "confirm": false,
+    "response": {
+      "request_id": "3db6d9c3076f",
+      "mode": "offline-planner",
+      "answer": "## MLOps agent report\n\n**Known facts (from tool evidence)**\n- (none)\n\n**Uncertainties**\n- `checkout_dataset_version` needs your confirmation: 'checkout_dataset_version' changes system state. Ask the user to explicitly confirm (re-send the request with confirm=true).. No claims are made about this part.\n\n**Recommended actions**\n- Re-send the same request with confirm=true if you really want this state-changing action.",
+      "known_facts": [],
+      "uncertainties": [
+        "`checkout_dataset_version` needs your confirmation: 'checkout_dataset_version' changes system state. Ask the user to explicitly confirm (re-send the request with confirm=true).. No claims are made about this part."
+      ],
+      "recommended_actions": [
+        "Re-send the same request with confirm=true if you really want this state-changing action."
+      ],
+      "evidence": [
+        {
+          "tool": "checkout_dataset_version",
+          "status": "needs_confirmation",
+          "summary": "needs_confirmation: 'checkout_dataset_version' changes system state. Ask the user to explicitly confirm (re-send the request with confirm=true)."
+        }
+      ],
+      "tool_calls": [
+        {
+          "tool": "checkout_dataset_version",
+          "status": "needs_confirmation",
+          "data": null,
+          "error": "'checkout_dataset_version' changes system state. Ask the user to explicitly confirm (re-send the request with confirm=true).",
+          "duration_ms": 0.02,
+          "request_id": "3db6d9c3076f"
+        }
+      ]
+    }
+  },
+  {
+    "title": "Failure 1d - Restore confirmed",
+    "backends": "REAL: DVC, MLflow | MOCKED: Kubernetes, Airflow",
+    "question": "Restore dataset version v2.0",
+    "confirm": true,
+    "response": {
+      "request_id": "f41ce56e1847",
+      "mode": "offline-planner",
+      "answer": "## MLOps agent report\n\n**Known facts (from tool evidence)**\n- Dataset restored to v2.0 (expected md5 c5b96f9c373a3bfc9b42697f2dc328e6).\n\n**Uncertainties**\n- (none)\n\n**Recommended actions**\n- (none)",
+      "known_facts": [
+        "Dataset restored to v2.0 (expected md5 c5b96f9c373a3bfc9b42697f2dc328e6)."
+      ],
+      "uncertainties": [],
+      "recommended_actions": [],
+      "evidence": [
+        {
+          "tool": "checkout_dataset_version",
+          "status": "ok",
+          "summary": "{\"restored_rev\": \"v2.0\", \"dvc_file\": \"data/dataset.csv.dvc\", \"expected_md5\": \"c5b96f9c373a3bfc9b42697f2dc328e6\", \"dvc_output\": \"M       data\\\\dataset.csv\"}"
+        }
+      ],
+      "tool_calls": [
+        {
+          "tool": "checkout_dataset_version",
+          "status": "ok",
+          "data": {
+            "restored_rev": "v2.0",
+            "dvc_file": "data/dataset.csv.dvc",
+            "expected_md5": "c5b96f9c373a3bfc9b42697f2dc328e6",
+            "dvc_output": "M       data\\dataset.csv"
+          },
+          "error": null,
+          "duration_ms": 3671.8,
+          "request_id": "f41ce56e1847"
+        }
+      ]
+    }
+  },
+  {
+    "title": "Failure 1e - Verify the fix",
+    "backends": "REAL: DVC, MLflow | MOCKED: Kubernetes, Airflow",
+    "question": "Has the tracked dataset changed since it was versioned?",
+    "confirm": false,
+    "response": {
+      "request_id": "8d023c77bbcd",
+      "mode": "offline-planner",
+      "answer": "## MLOps agent report\n\n**Known facts (from tool evidence)**\n- DVC status: Data and pipelines are up to date.\n\n**Uncertainties**\n- (none)\n\n**Recommended actions**\n- (none)",
+      "known_facts": [
+        "DVC status: Data and pipelines are up to date."
+      ],
+      "uncertainties": [],
+      "recommended_actions": [],
+      "evidence": [
+        {
+          "tool": "detect_data_changes",
+          "status": "ok",
+          "summary": "{\"changed\": false, \"details\": {}, \"summary\": \"Data and pipelines are up to date\"}"
+        }
+      ],
+      "tool_calls": [
+        {
+          "tool": "detect_data_changes",
+          "status": "ok",
+          "data": {
+            "changed": false,
+            "details": {},
+            "summary": "Data and pipelines are up to date"
+          },
+          "error": null,
+          "duration_ms": 3477.74,
+          "request_id": "8d023c77bbcd"
+        }
+      ]
+    }
+  },
+  {
+    "title": "Failure 2 - Why is my prediction API unavailable?",
+    "backends": "REAL: DVC, MLflow | MOCKED: Kubernetes, Airflow",
+    "question": "Why is my prediction API unavailable?",
+    "confirm": false,
+    "response": {
+      "request_id": "c0b92b7d8f36",
+      "mode": "offline-planner",
+      "answer": "## MLOps agent report\n\n**Known facts (from tool evidence)**\n- Deployment inference-api: desired 2, ready 0, available 0.\n- Pods: inference-api-7c8d-aaaaa[Running, ready=False, restarts=0], inference-api-7c8d-bbbbb[Running, ready=False, restarts=0]\n- UNHEALTHY pod inference-api-7c8d-aaaaa (Running, 0 restarts): inference-api: running but NOT ready (readiness probe failing).\n-   event Unhealthy: Readiness probe failed: HTTP probe failed with statuscode: 503\n- UNHEALTHY pod inference-api-7c8d-bbbbb (Running, 0 restarts): inference-api: running but NOT ready (readiness probe failing).\n-   event Unhealthy: Readiness probe failed: HTTP probe failed with statuscode: 503\n- Diagnosis for inference-api-7c8d-aaaaa: inference-api: running but NOT ready (readiness probe failing).\n- Last log lines: INFO Started server process | ERROR MODEL LOAD FAILED: FileNotFoundError: [Errno 2] No such file or directory: '/models/model_v9.joblib' | ERROR readiness failed: FileNotFoundError: /models/model_v9.joblib\n- Service inference-api (ClusterIP) selector={'app': 'inference-api'} ports=[{'port': 80, 'target_port': '8000'}] ready endpoints=0.\n- Service inference-api has NO ready endpoints -> requests cannot be served.\n\n**Uncertainties**\n- (none)\n\n**Recommended actions**\n- Inspect the pod logs/events above; fix the root cause (image, config, resources or probe) before restarting.",
+      "known_facts": [
+        "Deployment inference-api: desired 2, ready 0, available 0.",
+        "Pods: inference-api-7c8d-aaaaa[Running, ready=False, restarts=0], inference-api-7c8d-bbbbb[Running, ready=False, restarts=0]",
+        "UNHEALTHY pod inference-api-7c8d-aaaaa (Running, 0 restarts): inference-api: running but NOT ready (readiness probe failing).",
+        "  event Unhealthy: Readiness probe failed: HTTP probe failed with statuscode: 503",
+        "UNHEALTHY pod inference-api-7c8d-bbbbb (Running, 0 restarts): inference-api: running but NOT ready (readiness probe failing).",
+        "  event Unhealthy: Readiness probe failed: HTTP probe failed with statuscode: 503",
+        "Diagnosis for inference-api-7c8d-aaaaa: inference-api: running but NOT ready (readiness probe failing).",
+        "Last log lines: INFO Started server process | ERROR MODEL LOAD FAILED: FileNotFoundError: [Errno 2] No such file or directory: '/models/model_v9.joblib' | ERROR readiness failed: FileNotFoundError: /models/model_v9.joblib",
+        "Service inference-api (ClusterIP) selector={'app': 'inference-api'} ports=[{'port': 80, 'target_port': '8000'}] ready endpoints=0.",
+        "Service inference-api has NO ready endpoints -> requests cannot be served."
+      ],
+      "uncertainties": [],
+      "recommended_actions": [
+        "Inspect the pod logs/events above; fix the root cause (image, config, resources or probe) before restarting."
+      ],
+      "evidence": [
+        {
+          "tool": "list_k8s_workloads",
+          "status": "ok",
+          "summary": "{\"namespace\": \"mlops-agent\", \"deployments\": [{\"name\": \"inference-api\", \"desired\": 2, \"ready\": 0, \"available\": 0, \"updated\": 0}], \"pods\": [{\"name\": \"inference-api-7c8d-aaaaa\", \"phase\": \"Running\", \"ready\": false, \"resta..."
+        },
+        {
+          "tool": "find_unhealthy_pods",
+          "status": "ok",
+          "summary": "{\"namespace\": \"mlops-agent\", \"total_pods\": 2, \"unhealthy\": [{\"pod\": \"inference-api-7c8d-aaaaa\", \"phase\": \"Running\", \"restarts\": 0, \"reasons\": [\"inference-api: running but NOT ready (readiness probe failing)\"], \"warnin..."
+        },
+        {
+          "tool": "get_pod_status_and_logs",
+          "status": "ok",
+          "summary": "{\"pod\": {\"name\": \"inference-api-7c8d-aaaaa\", \"phase\": \"Running\", \"ready\": false, \"restarts\": 0, \"containers\": [{\"container\": \"inference-api\", \"ready\": false, \"restarts\": 0, \"image\": \"mlops-inference:1.0.0\"}], \"node\": ..."
+        },
+        {
+          "tool": "inspect_k8s_services",
+          "status": "ok",
+          "summary": "{\"namespace\": \"mlops-agent\", \"services\": [{\"name\": \"inference-api\", \"type\": \"ClusterIP\", \"cluster_ip\": \"10.0.0.5\", \"selector\": {\"app\": \"inference-api\"}, \"ports\": [{\"port\": 80, \"target_port\": \"8000\"}], \"ready_endpoints..."
+        }
+      ],
+      "tool_calls": [
+        {
+          "tool": "list_k8s_workloads",
+          "status": "ok",
+          "data": {
+            "namespace": "mlops-agent",
+            "deployments": [
+              {
+                "name": "inference-api",
+                "desired": 2,
+                "ready": 0,
+                "available": 0,
+                "updated": 0
+              }
+            ],
+            "pods": [
+              {
+                "name": "inference-api-7c8d-aaaaa",
+                "phase": "Running",
+                "ready": false,
+                "restarts": 0
+              },
+              {
+                "name": "inference-api-7c8d-bbbbb",
+                "phase": "Running",
+                "ready": false,
+                "restarts": 0
+              }
+            ]
+          },
+          "error": null,
+          "duration_ms": 0.54,
+          "request_id": "c0b92b7d8f36"
+        },
+        {
+          "tool": "find_unhealthy_pods",
+          "status": "ok",
+          "data": {
+            "namespace": "mlops-agent",
+            "total_pods": 2,
+            "unhealthy": [
+              {
+                "pod": "inference-api-7c8d-aaaaa",
+                "phase": "Running",
+                "restarts": 0,
+                "reasons": [
+                  "inference-api: running but NOT ready (readiness probe failing)"
+                ],
+                "warning_events": [
+                  {
+                    "type": "Warning",
+                    "reason": "Unhealthy",
+                    "message": "Readiness probe failed: HTTP probe failed with statuscode: 503",
+                    "count": 14
+                  }
+                ]
+              },
+              {
+                "pod": "inference-api-7c8d-bbbbb",
+                "phase": "Running",
+                "restarts": 0,
+                "reasons": [
+                  "inference-api: running but NOT ready (readiness probe failing)"
+                ],
+                "warning_events": [
+                  {
+                    "type": "Warning",
+                    "reason": "Unhealthy",
+                    "message": "Readiness probe failed: HTTP probe failed with statuscode: 503",
+                    "count": 14
+                  }
+                ]
+              }
+            ],
+            "healthy_count": 0
+          },
+          "error": null,
+          "duration_ms": 0.12,
+          "request_id": "c0b92b7d8f36"
+        },
+        {
+          "tool": "get_pod_status_and_logs",
+          "status": "ok",
+          "data": {
+            "pod": {
+              "name": "inference-api-7c8d-aaaaa",
+              "phase": "Running",
+              "ready": false,
+              "restarts": 0,
+              "containers": [
+                {
+                  "container": "inference-api",
+                  "ready": false,
+                  "restarts": 0,
+                  "image": "mlops-inference:1.0.0"
+                }
+              ],
+              "node": "node-1",
+              "labels": {
+                "app": "inference-api"
+              }
+            },
+            "problems": [
+              "inference-api: running but NOT ready (readiness probe failing)"
+            ],
+            "events": [
+              {
+                "type": "Warning",
+                "reason": "Unhealthy",
+                "message": "Readiness probe failed: HTTP probe failed with statuscode: 503",
+                "count": 14
+              }
+            ],
+            "log_tail": [
+              "INFO Started server process",
+              "ERROR MODEL LOAD FAILED: FileNotFoundError: [Errno 2] No such file or directory: '/models/model_v9.joblib'",
+              "ERROR readiness failed: FileNotFoundError: /models/model_v9.joblib"
+            ],
+            "note": null
+          },
+          "error": null,
+          "duration_ms": 0.13,
+          "request_id": "c0b92b7d8f36"
+        },
+        {
+          "tool": "inspect_k8s_services",
+          "status": "ok",
+          "data": {
+            "namespace": "mlops-agent",
+            "services": [
+              {
+                "name": "inference-api",
+                "type": "ClusterIP",
+                "cluster_ip": "10.0.0.5",
+                "selector": {
+                  "app": "inference-api"
+                },
+                "ports": [
+                  {
+                    "port": 80,
+                    "target_port": "8000"
+                  }
+                ],
+                "ready_endpoints": 0
+              }
+            ]
+          },
+          "error": null,
+          "duration_ms": 0.09,
+          "request_id": "c0b92b7d8f36"
+        }
+      ]
+    }
+  },
+  {
+    "title": "Failure 3 - Quality gate blocks promotion",
+    "backends": "REAL: DVC, MLflow | MOCKED: Kubernetes, Airflow",
+    "question": "Compare the last 6 mlflow runs on f1 and explain why the pipeline failed.",
+    "confirm": false,
+    "response": {
+      "request_id": "b679423dd615",
+      "mode": "offline-planner",
+      "answer": "## MLOps agent report\n\n**Known facts (from tool evidence)**\n- Run #6 (d909525e): f1=0.6189, params={'n_estimators': '1', 'max_depth': '1', 'random_state': '42'}, quality_gate=failed\n- Run #5 (7c16875d): f1=0.9105, params={'n_estimators': '400', 'max_depth': '14', 'random_state': '42'}, quality_gate=passed\n- Run #4 (5b10b111): f1=0.8995, params={'n_estimators': '100', 'max_depth': '8', 'random_state': '42'}, quality_gate=passed\n- Run #3 (cfe2b994): f1=0.8170, params={'n_estimators': '50', 'max_depth': '4', 'random_state': '42'}, quality_gate=failed\n- Run #2 (87aae574): f1=0.8898, params={'n_estimators': '300', 'max_depth': '12', 'random_state': '42'}, quality_gate=passed\n- Run #1 (960d6ff5): f1=0.8537, params={'n_estimators': '100', 'max_depth': '8', 'random_state': '42'}, quality_gate=passed\n- Candidate by f1: 7c16875d (params that differ: ['max_depth', 'n_estimators']).\n- Airflow run manual__1: failed; tasks {'validate_dataset': 'success', 'preprocess_data': 'success', 'train_model': 'success', 'evaluate_and_log_mlflow': 'success', 'quality_gate': 'failed', 'promote_model': 'upstream_failed'}.\n- Failed tasks in manual__1: [{'task_id': 'quality_gate', 'state': 'failed', 'try_number': 3, 'max_tries': 2}, {'task_id': 'promote_model', 'state': 'upstream_failed', 'try_number': 0, 'max_tries': 2}]; root failure(s): ['quality_gate'].\n- Task quality_gate failed after try 3/2; error lines: ['ERROR quality gate failed: f1=0.6189 < threshold 0.85. Promotion blocked.', 'airflow.exceptions.AirflowFailException'].\n\n**Uncertainties**\n- The recommendation uses the recorded metric only. Readiness of the candidate: meets all recorded readiness checks - still needs human promotion review.\n\n**Recommended actions**\n- Fix the cause shown in the quality_gate log, then re-run the pipeline (needs your confirmation).",
+      "known_facts": [
+        "Run #6 (d909525e): f1=0.6189, params={'n_estimators': '1', 'max_depth': '1', 'random_state': '42'}, quality_gate=failed",
+        "Run #5 (7c16875d): f1=0.9105, params={'n_estimators': '400', 'max_depth': '14', 'random_state': '42'}, quality_gate=passed",
+        "Run #4 (5b10b111): f1=0.8995, params={'n_estimators': '100', 'max_depth': '8', 'random_state': '42'}, quality_gate=passed",
+        "Run #3 (cfe2b994): f1=0.8170, params={'n_estimators': '50', 'max_depth': '4', 'random_state': '42'}, quality_gate=failed",
+        "Run #2 (87aae574): f1=0.8898, params={'n_estimators': '300', 'max_depth': '12', 'random_state': '42'}, quality_gate=passed",
+        "Run #1 (960d6ff5): f1=0.8537, params={'n_estimators': '100', 'max_depth': '8', 'random_state': '42'}, quality_gate=passed",
+        "Candidate by f1: 7c16875d (params that differ: ['max_depth', 'n_estimators']).",
+        "Airflow run manual__1: failed; tasks {'validate_dataset': 'success', 'preprocess_data': 'success', 'train_model': 'success', 'evaluate_and_log_mlflow': 'success', 'quality_gate': 'failed', 'promote_model': 'upstream_failed'}.",
+        "Failed tasks in manual__1: [{'task_id': 'quality_gate', 'state': 'failed', 'try_number': 3, 'max_tries': 2}, {'task_id': 'promote_model', 'state': 'upstream_failed', 'try_number': 0, 'max_tries': 2}]; root failure(s): ['quality_gate'].",
+        "Task quality_gate failed after try 3/2; error lines: ['ERROR quality gate failed: f1=0.6189 < threshold 0.85. Promotion blocked.', 'airflow.exceptions.AirflowFailException']."
+      ],
+      "uncertainties": [
+        "The recommendation uses the recorded metric only. Readiness of the candidate: meets all recorded readiness checks - still needs human promotion review."
+      ],
+      "recommended_actions": [
+        "Fix the cause shown in the quality_gate log, then re-run the pipeline (needs your confirmation)."
+      ],
+      "evidence": [
+        {
+          "tool": "compare_mlflow_runs",
+          "status": "ok",
+          "summary": "{\"metric\": \"f1\", \"runs\": [{\"run_id\": \"d909525ef100459f82ef76e640502269\", \"run_name\": \"rf-run-6\", \"run_number\": \"6\", \"status\": \"FINISHED\", \"start_time\": 1794650819436, \"metrics\": {\"accuracy\": 0.688, \"f1\": 0.61889250814..."
+        },
+        {
+          "tool": "get_dag_run_status",
+          "status": "ok",
+          "summary": "{\"dag_id\": \"training_pipeline\", \"runs\": [{\"dag_run_id\": \"manual__1\", \"state\": \"failed\", \"run_type\": \"manual\", \"logical_date\": null, \"start_date\": null, \"end_date\": null, \"conf\": null, \"tasks\": {\"validate_dataset\": \"su..."
+        },
+        {
+          "tool": "get_failed_tasks",
+          "status": "ok",
+          "summary": "{\"dag_run_id\": \"manual__1\", \"run_state\": \"failed\", \"failed_tasks\": [{\"task_id\": \"quality_gate\", \"state\": \"failed\", \"try_number\": 3, \"max_tries\": 2}, {\"task_id\": \"promote_model\", \"state\": \"upstream_failed\", \"try_number..."
+        },
+        {
+          "tool": "get_task_diagnostics",
+          "status": "ok",
+          "summary": "{\"dag_run_id\": \"manual__1\", \"task_id\": \"quality_gate\", \"state\": \"failed\", \"try_number\": 3, \"max_tries\": 2, \"start_date\": null, \"end_date\": null, \"duration\": null, \"error_lines\": [\"ERROR quality gate failed: f1=0.6189 ..."
+        }
+      ],
+      "tool_calls": [
+        {
+          "tool": "compare_mlflow_runs",
+          "status": "ok",
+          "data": {
+            "metric": "f1",
+            "runs": [
+              {
+                "run_id": "d909525ef100459f82ef76e640502269",
+                "run_name": "rf-run-6",
+                "run_number": "6",
+                "status": "FINISHED",
+                "start_time": 1794650819436,
+                "metrics": {
+                  "accuracy": 0.688,
+                  "f1": 0.6188925081433225,
+                  "precision": 0.7983193277310925,
+                  "recall": 0.5053191489361702
+                },
+                "params": {
+                  "n_estimators": "1",
+                  "max_depth": "1",
+                  "random_state": "42"
+                },
+                "quality_gate": "failed",
+                "dvc_md5": "c5b96f9c373a3bfc9b42697f2dc328e6",
+                "dvc_version": "v2.0",
+                "git_commit": "06510c015fd27a0f50956da6fb8106d3d8c62df6",
+                "airflow_dag_run_id": null
+              },
+              {
+                "run_id": "7c16875de71c49ac923b02a0aed9d10b",
+                "run_name": "rf-run-5",
+                "run_number": "5",
+                "status": "FINISHED",
+                "start_time": 1794650806264,
+                "metrics": {
+                  "accuracy": 0.9093333333333333,
+                  "f1": 0.9105263157894737,
+                  "precision": 0.9010416666666666,
+                  "recall": 0.9202127659574468
+                },
+                "params": {
+                  "n_estimators": "400",
+                  "max_depth": "14",
+                  "random_state": "42"
+                },
+                "quality_gate": "passed",
+                "dvc_md5": "c5b96f9c373a3bfc9b42697f2dc328e6",
+                "dvc_version": "v2.0",
+                "git_commit": "06510c015fd27a0f50956da6fb8106d3d8c62df6",
+                "airflow_dag_run_id": null
+              },
+              {
+                "run_id": "5b10b1119f8c4d92862d717b7c58ad2f",
+                "run_name": "rf-run-4",
+                "run_number": "4",
+                "status": "FINISHED",
+                "start_time": 1794650790391,
+                "metrics": {
+                  "accuracy": 0.8986666666666666,
+                  "f1": 0.8994708994708994,
+                  "precision": 0.8947368421052632,
+                  "recall": 0.9042553191489362
+                },
+                "params": {
+                  "n_estimators": "100",
+                  "max_depth": "8",
+                  "random_state": "42"
+                },
+                "quality_gate": "passed",
+                "dvc_md5": "c5b96f9c373a3bfc9b42697f2dc328e6",
+                "dvc_version": "v2.0",
+                "git_commit": "06510c015fd27a0f50956da6fb8106d3d8c62df6",
+                "airflow_dag_run_id": null
+              },
+              {
+                "run_id": "cfe2b99487e14d20a8b6433a574df69e",
+                "run_name": "rf-run-3",
+                "run_number": "3",
+                "status": "FINISHED",
+                "start_time": 1794650760952,
+                "metrics": {
+                  "accuracy": 0.828,
+                  "f1": 0.8170212765957446,
+                  "precision": 0.8727272727272727,
+                  "recall": 0.768
+                },
+                "params": {
+                  "n_estimators": "50",
+                  "max_depth": "4",
+                  "random_state": "42"
+                },
+                "quality_gate": "failed",
+                "dvc_md5": "4725b62888d5b51df1db1713520729c2",
+                "dvc_version": "v1.0",
+                "git_commit": "b50a8cf7b87d167690be647a672d76a5006ab9dc",
+                "airflow_dag_run_id": null
+              },
+              {
+                "run_id": "87aae574aaf048a5886e004c6b6ee383",
+                "run_name": "rf-run-2",
+                "run_number": "2",
+                "status": "FINISHED",
+                "start_time": 1794650747844,
+                "metrics": {
+                  "accuracy": 0.892,
+                  "f1": 0.889795918367347,
+                  "precision": 0.9083333333333333,
+                  "recall": 0.872
+                },
+                "params": {
+                  "n_estimators": "300",
+                  "max_depth": "12",
+                  "random_state": "42"
+                },
+                "quality_gate": "passed",
+                "dvc_md5": "4725b62888d5b51df1db1713520729c2",
+                "dvc_version": "v1.0",
+                "git_commit": "b50a8cf7b87d167690be647a672d76a5006ab9dc",
+                "airflow_dag_run_id": null
+              },
+              {
+                "run_id": "960d6ff53e7c4db7b93ef8011f4f99fc",
+                "run_name": "rf-run-1",
+                "run_number": "1",
+                "status": "FINISHED",
+                "start_time": 1794650728656,
+                "metrics": {
+                  "accuracy": 0.856,
+                  "f1": 0.8536585365853658,
+                  "precision": 0.8677685950413223,
+                  "recall": 0.84
+                },
+                "params": {
+                  "n_estimators": "100",
+                  "max_depth": "8",
+                  "random_state": "42"
+                },
+                "quality_gate": "passed",
+                "dvc_md5": "4725b62888d5b51df1db1713520729c2",
+                "dvc_version": "v1.0",
+                "git_commit": "b50a8cf7b87d167690be647a672d76a5006ab9dc",
+                "airflow_dag_run_id": null
+              }
+            ],
+            "ranking": [
+              "7c16875de71c49ac923b02a0aed9d10b",
+              "5b10b1119f8c4d92862d717b7c58ad2f",
+              "87aae574aaf048a5886e004c6b6ee383",
+              "960d6ff53e7c4db7b93ef8011f4f99fc",
+              "cfe2b99487e14d20a8b6433a574df69e",
+              "d909525ef100459f82ef76e640502269"
+            ],
+            "params_that_differ": [
+              "max_depth",
+              "n_estimators"
+            ],
+            "recommended": "7c16875de71c49ac923b02a0aed9d10b",
+            "readiness": {
+              "checks": [
+                {
+                  "check": "quality_gate_passed",
+                  "ok": true,
+                  "detail": "passed"
+                },
+                {
+                  "check": "f1>=0.85",
+                  "ok": true,
+                  "detail": "f1=0.9105"
+                },
+                {
+                  "check": "dataset_provenance_recorded",
+                  "ok": true,
+                  "detail": "c5b96f9c373a3bfc9b42697f2dc328e6"
+                },
+                {
+                  "check": "registered_in_model_registry",
+                  "ok": true,
+                  "detail": "registered"
+                },
+                {
+                  "check": "fresh(<=30d)",
+                  "ok": true,
+                  "detail": "0.0 days old"
+                }
+              ],
+              "age_days": 0.01,
+              "verdict": "meets all recorded readiness checks - still needs human promotion review"
+            },
+            "caveat": "Recommendation is by the recorded metric only; check readiness before promotion."
+          },
+          "error": null,
+          "duration_ms": 30.86,
+          "request_id": "b679423dd615"
+        },
+        {
+          "tool": "get_dag_run_status",
+          "status": "ok",
+          "data": {
+            "dag_id": "training_pipeline",
+            "runs": [
+              {
+                "dag_run_id": "manual__1",
+                "state": "failed",
+                "run_type": "manual",
+                "logical_date": null,
+                "start_date": null,
+                "end_date": null,
+                "conf": null,
+                "tasks": {
+                  "validate_dataset": "success",
+                  "preprocess_data": "success",
+                  "train_model": "success",
+                  "evaluate_and_log_mlflow": "success",
+                  "quality_gate": "failed",
+                  "promote_model": "upstream_failed"
+                }
+              }
+            ]
+          },
+          "error": null,
+          "duration_ms": 0.2,
+          "request_id": "b679423dd615"
+        },
+        {
+          "tool": "get_failed_tasks",
+          "status": "ok",
+          "data": {
+            "dag_run_id": "manual__1",
+            "run_state": "failed",
+            "failed_tasks": [
+              {
+                "task_id": "quality_gate",
+                "state": "failed",
+                "try_number": 3,
+                "max_tries": 2
+              },
+              {
+                "task_id": "promote_model",
+                "state": "upstream_failed",
+                "try_number": 0,
+                "max_tries": 2
+              }
+            ],
+            "root_failures": [
+              "quality_gate"
+            ]
+          },
+          "error": null,
+          "duration_ms": 0.17,
+          "request_id": "b679423dd615"
+        },
+        {
+          "tool": "get_task_diagnostics",
+          "status": "ok",
+          "data": {
+            "dag_run_id": "manual__1",
+            "task_id": "quality_gate",
+            "state": "failed",
+            "try_number": 3,
+            "max_tries": 2,
+            "start_date": null,
+            "end_date": null,
+            "duration": null,
+            "error_lines": [
+              "ERROR quality gate failed: f1=0.6189 < threshold 0.85. Promotion blocked.",
+              "airflow.exceptions.AirflowFailException"
+            ],
+            "log_tail": [
+              "INFO starting",
+              "ERROR quality gate failed: f1=0.6189 < threshold 0.85. Promotion blocked.",
+              "airflow.exceptions.AirflowFailException"
+            ]
+          },
+          "error": null,
+          "duration_ms": 0.19,
+          "request_id": "b679423dd615"
+        }
+      ]
+    }
+  },
+  {
+    "title": "Safety - restart in an unapproved namespace",
+    "backends": "REAL: DVC, MLflow | MOCKED: Kubernetes, Airflow",
+    "question": "restart coredns in kube-system (confirm=true)",
+    "confirm": true,
+    "response": {
+      "answer": "denied: Namespace 'kube-system' is not approved. Approved namespaces: ['mlops-agent']",
+      "tool_calls": [
+        {
+          "tool": "restart_k8s_deployment",
+          "status": "denied",
+          "data": null,
+          "error": "Namespace 'kube-system' is not approved. Approved namespaces: ['mlops-agent']",
+          "duration_ms": 0.5,
+          "request_id": "6fbda4760176"
+        }
+      ]
+    }
+  }
+]

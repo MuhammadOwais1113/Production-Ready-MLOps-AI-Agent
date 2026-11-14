@@ -36,7 +36,7 @@ def training_pipeline():
             return validate()
         except DataValidationError as exc:
             log.error("ERROR dataset validation failed: %s", exc)
-            raise AirflowFailException(str(exc))  # no point retrying bad data
+            raise AirflowFailException(str(exc)) from exc  # no point retrying bad data
 
     @task
     def preprocess_data(_validated: dict) -> dict:
@@ -57,12 +57,13 @@ def training_pipeline():
 
     @task
     def quality_gate(result: dict) -> dict:
-        from training.pipeline import QualityGateError, quality_gate as gate
+        from training.pipeline import QualityGateError
+        from training.pipeline import quality_gate as gate
         try:
             return gate(result)
         except QualityGateError as exc:
             log.error("ERROR quality gate failed: %s", exc)
-            raise AirflowFailException(str(exc))
+            raise AirflowFailException(str(exc)) from exc
 
     @task(trigger_rule="all_success")
     def promote_model(result: dict) -> dict:

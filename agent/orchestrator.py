@@ -140,7 +140,7 @@ class Orchestrator:
         has = lambda *w: any(re.search(rf"\b{x}", m) for x in w)  # noqa: E731
         d_mlflow = has("mlflow", "best", "model", "metric", "f1", "accuracy", "runs?", "experiments?", "registry", "candidate")
         d_dvc = has("dvc", "dataset", "data version", "provenance", "data changed", "data drift", "reproduce")
-        d_air = has("airflow", "dag", "pipeline", "workflow", "retrain\\w*", "training", "failed task")
+        d_air = has("airflow", "dag", "pipeline", "workflow", "retrain\\w*", "failed task")
         d_k8s = has("kubernetes", "k8s", "pod", "pods", "deployment", "deployed", "service", "api unavailable", "unavailable",
                     "prediction api", "namespace", "replicas?", "restart")
         retrain_q = has("retrain\\w*") and has("whether", "necessary", "need", "should", "required")
@@ -168,7 +168,7 @@ class Orchestrator:
             g = re.search(r"(\d+)\s*replicas?|to\s+(\d+)", m)
             steps.append(("scale_k8s_deployment", {"replicas": int(g.group(1) or g.group(2))}))
         else:
-            if (d_mlflow and not d_air or (d_mlflow and has("best", "compare", "registry"))) and not (d_dvc and run_no):
+            if (d_mlflow and (not d_air or has("best", "compare", "registry", "mlflow", "f1", "accuracy", "metrics?"))) and not (d_dvc and run_no):
                 if has("registry", "model version", "versions"):
                     steps.append(("get_model_registry_info", {}))
                 elif has("compare"):
@@ -186,7 +186,9 @@ class Orchestrator:
                     steps.append(("get_experiment_dataset", {"run_number": int(run_no.group(1))}))
                 elif len(revs) >= 2 and has("compare", "diff", "differ"):
                     steps.append(("compare_dataset_versions", {"rev_a": revs[0], "rev_b": revs[1]}))
-                elif has("reproduce", "restore", "recreate"):
+                elif has("checkout", "restore") and not has("how", "explain", "steps"):
+                    steps.append(("checkout_dataset_version", {"rev": revs[0] if revs else "HEAD"}))
+                elif has("reproduce", "restore", "recreate", "checkout"):
                     steps.append(("explain_dataset_reproduction", {"rev": revs[0] if revs else "HEAD"}))
                 elif has("changed", "change", "modified", "drift", "tamper"):
                     steps.append(("detect_data_changes", {}))
@@ -236,6 +238,10 @@ def _render(title: str, facts: list[str], unc: list[str], acts: list[str]) -> st
                                             sec("Recommended actions", acts)])
 
 
+def _fmt(v: Any) -> str:
+    return f"{v:.4f}" if isinstance(v, (int, float)) else "n/a"
+
+
 def _get(ctx: dict[str, Any], tool: str) -> ToolResult | None:
     return ctx.get(tool)
 
@@ -275,11 +281,11 @@ def _correlate(ctx: dict[str, Any], s: Settings, plan: dict[str, Any]) -> tuple[
                 retrain_evidence.append(f"model is {rd['age_days']} days old, exceeding the {s.max_model_age_days}-day freshness policy")
         elif name == "compare_mlflow_runs":
             for run in d["runs"]:
-                facts.append(f"Run #{run['run_number']} ({run['run_id'][:8]}): {d['metric']}={run['metrics'].get(d['metric'], 'n/a')}, "
+                facts.append(f"Run #{run['run_number']} ({run['run_id'][:8]}): {d['metric']}={_fmt(run['metrics'].get(d['metric']))}, "
                              f"params={run['params']}, quality_gate={run['quality_gate']}")
             if d["recommended"]:
                 facts.append(f"Candidate by {d['metric']}: {d['recommended'][:8]} (params that differ: {d['params_that_differ']}).")
-                unc.append("Recommendation uses the recorded metric only. " + d["readiness"]["verdict"])
+                unc.append("The recommendation uses the recorded metric only. Readiness of the candidate: " + d["readiness"]["verdict"] + ".")
         elif name == "list_mlflow_runs":
             for run in d["runs"]:
                 facts.append(f"Run #{run['run_number']} {run['run_id'][:8]} [{run['status']}] metrics={ {k: round(v, 4) for k, v in run['metrics'].items()} } gate={run['quality_gate']}")
@@ -367,7 +373,7 @@ def _correlate(ctx: dict[str, Any], s: Settings, plan: dict[str, Any]) -> tuple[
             else:
                 facts.append(f"No failed tasks in run {d['dag_run_id']} (state {d['run_state']}).")
         elif name == "get_task_diagnostics":
-            facts.append(f"Task {d['task_id']} {d['state']} after try {d['try_number']}/{d['max_tries']}; error lines: {d['error_lines'][-5:]}.")
+            facts.append(f"Task {d['task_id']} {d['state']} on attempt {d['try_number']} (retries configured: {d['max_tries']}); error lines: {d['error_lines'][-5:]}.")
             acts.append(f"Fix the cause shown in the {d['task_id']} log, then re-run the pipeline (needs your confirmation).")
     # cross-tool correlation
     best, ds_now, ds_run = _get(ctx, "find_best_mlflow_run"), _get(ctx, "get_dataset_version"), _get(ctx, "get_experiment_dataset")
@@ -380,6 +386,8 @@ def _correlate(ctx: dict[str, Any], s: Settings, plan: dict[str, Any]) -> tuple[
     if plan["kind"] == "multi":
         if retrain_evidence:
             acts.insert(0, "Retraining IS justified by evidence: " + "; ".join(retrain_evidence) + ". Retraining was NOT started automatically - ask me to trigger it and confirm.")
+        elif not (best and best.ok):
+            acts.insert(0, "Cannot assess whether retraining is necessary: the MLflow evidence needed is unavailable. Retry once the service is reachable.")
         else:
             acts.insert(0, "Retraining is NOT currently necessary: no freshness-policy breach, failed quality gate or supplied degradation results were found in the evidence.")
         unc.append("Live production performance/drift data was not provided, so degradation in production cannot be ruled out.")

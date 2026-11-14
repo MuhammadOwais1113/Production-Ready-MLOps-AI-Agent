@@ -92,7 +92,7 @@ def dvc_provenance(repo: Path | None = None) -> dict[str, str]:
     repo = Path(repo or REPO)
     prov: dict[str, str] = {"dvc.file": DVC_FILE}
     try:
-        meta = yaml.safe_load((repo / DVC_FILE).read_text(encoding="utf-8"))["outs"][0]
+        meta = yaml.load((repo / DVC_FILE).read_text(encoding="utf-8"), Loader=yaml.BaseLoader)["outs"][0]
         prov["dvc.md5"], prov["dvc.size"] = str(meta["md5"]), str(meta.get("size"))
     except Exception as exc:  # noqa: BLE001
         log.warning("no DVC pointer readable: %s", exc)

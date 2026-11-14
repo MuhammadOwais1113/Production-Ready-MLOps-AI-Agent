@@ -10,8 +10,7 @@ from typing import Any, Callable
 
 import yaml
 
-from agent.schemas import (CheckoutArgs, CompareDatasetArgs, DatasetArgs, ExperimentRunRef, NoArgs,
-                           ReproduceArgs)
+from agent.schemas import CheckoutArgs, CompareDatasetArgs, DatasetArgs, ExperimentRunRef, NoArgs, ReproduceArgs
 from agent.tools.base import Tool, ToolDenied, ToolError, ToolUnavailable
 
 # (executable, subcommand) pairs that may be run. Anything else is rejected.
@@ -76,12 +75,15 @@ class DvcTools:
 
     @staticmethod
     def _parse(text: str) -> dict[str, Any]:
-        doc = yaml.safe_load(text) or {}
+        # BaseLoader keeps every scalar a string: an md5 such as "12e4..." or "2222..." must never become a float/int
+        doc = yaml.load(text, Loader=yaml.BaseLoader) or {}
         outs = doc.get("outs") or []
         if not outs:
             raise ToolError("Malformed .dvc file: no 'outs'")
         o = outs[0]
-        return {"md5": o.get("md5"), "size": o.get("size"), "nfiles": o.get("nfiles"), "path": o.get("path")}
+        size = int(o["size"]) if o.get("size") else None
+        nfiles = int(o["nfiles"]) if o.get("nfiles") else None
+        return {"md5": o.get("md5"), "size": size, "nfiles": nfiles, "path": o.get("path")}
 
     def _git(self, *args: str) -> str:
         rc, out, err = self.runner.run(["git", *args])
@@ -165,7 +167,7 @@ class DvcTools:
         f = self._pick(a.dataset)
         meta = self._dvc_at(a.rev, f)
         self._git("checkout", _safe_rev(a.rev), "--", f)
-        rc, out, err = self.runner.run(["dvc", "checkout", f])
+        rc, out, err = self.runner.run(["dvc", "checkout", "--force", f])  # confirmed by user: overwrites local edits
         if rc != 0:
             raise ToolError(f"dvc checkout failed: {err or out}")
         return {"restored_rev": a.rev, "dvc_file": f, "expected_md5": meta["md5"], "dvc_output": out}
@@ -226,5 +228,5 @@ class DvcTools:
             Tool("detect_data_changes", "Detect whether tracked data in the workspace changed vs. its DVC-recorded hash (dvc status).", NoArgs, self.detect_changes, "dvc"),
             Tool("explain_dataset_reproduction", "Explain (read-only) the exact steps to reproduce a previous dataset version.", ReproduceArgs, self.explain_reproduce, "dvc"),
             Tool("get_experiment_dataset", "Read the DVC dataset version recorded in an MLflow run's provenance tags, verified against git history. Use run_id or run_number.", ExperimentRunRef, self.experiment_dataset, "dvc"),
-            Tool("checkout_dataset_version", "Restore a previous dataset version into the workspace (git checkout of the .dvc pointer + dvc checkout).", CheckoutArgs, self.checkout_version, "dvc", mutating=True),
+            Tool("checkout_dataset_version", "Restore a dataset version into the workspace (git checkout of the .dvc pointer + dvc checkout --force; overwrites local modifications of the data file).", CheckoutArgs, self.checkout_version, "dvc", mutating=True),
         ]

@@ -1,0 +1,48 @@
+# Local MLOps stack: MLflow tracking server + Apache Airflow 3 (standalone: api-server, scheduler, dag-processor, triggerer).
+#   cd infra && cp .env.example .env   (edit passwords)   &&   docker compose up -d
+#   Airflow UI/API: http://localhost:8080 (user admin / $AIRFLOW_ADMIN_PASSWORD)    MLflow UI: http://localhost:5000
+name: mlops-agent-stack
+services:
+  mlflow:
+    image: python:3.11-slim
+    command: >
+      bash -c "pip install -q 'mlflow==3.1.1' &&
+      mlflow server --host 0.0.0.0 --port 5000
+      --backend-store-uri sqlite:////mlflow/mlflow.db
+      --serve-artifacts --artifacts-destination /mlflow/artifacts"
+    ports: ["5000:5000"]
+    volumes: ["mlflow-data:/mlflow"]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request;urllib.request.urlopen('http://localhost:5000/health')"]
+      interval: 10s
+      retries: 30
+
+  airflow:
+    image: apache/airflow:3.0.6
+    depends_on:
+      mlflow: {condition: service_healthy}
+    ports: ["8080:8080"]
+    environment:
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+      AIRFLOW__CORE__DAGS_FOLDER: /opt/airflow/project/dags
+      AIRFLOW__CORE__SIMPLE_AUTH_MANAGER_USERS: "admin:admin"
+      AIRFLOW__CORE__SIMPLE_AUTH_MANAGER_PASSWORDS_FILE: /opt/airflow/passwords.json
+      AIRFLOW__API_AUTH__JWT_EXPIRATION_TIME: "3600"
+      _PIP_ADDITIONAL_REQUIREMENTS: "pandas scikit-learn joblib numpy pyyaml sqlalchemy mlflow-skinny==3.1.1"
+      MLFLOW_TRACKING_URI: http://mlflow:5000
+      REPO_ROOT: /opt/airflow/project
+      PIPELINE_WORKDIR: /tmp/pipeline-artifacts
+      QUALITY_GATE_F1: "0.85"
+      AIRFLOW_ADMIN_PASSWORD: ${AIRFLOW_ADMIN_PASSWORD:?set AIRFLOW_ADMIN_PASSWORD in infra/.env}
+    volumes:
+      - ..:/opt/airflow/project
+      - airflow-data:/opt/airflow
+    entrypoint: ["/bin/bash", "-c"]
+    command:
+      - |
+        echo "{\"admin\": \"$$AIRFLOW_ADMIN_PASSWORD\"}" > /opt/airflow/passwords.json
+        exec /entrypoint airflow standalone
+
+volumes:
+  mlflow-data:
+  airflow-data:
