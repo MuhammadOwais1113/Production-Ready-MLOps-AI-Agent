@@ -170,7 +170,7 @@ def build() -> Path:
           P("1. Evidence honesty statement", H1),
           table([["Backend", "In this report", "Notes"],
                  ["DVC", "REAL (git + dvc CLI, local DVC remote)", "Two dataset versions v1.0 / v2.0, checkout demonstrated"],
-                 ["MLflow", "REAL (SQLite backend, runs written by the training pipeline)", "6 runs incl. a natural and an injected quality-gate failure"],
+                 ["MLflow", "REAL (SQLite backend, runs written by the training pipeline)", "7 runs incl. a natural and an injected quality-gate failure"],
                  ["Airflow 3", "Agent client verified against scripted Airflow REST responses (CI/demo); DAG file reviewed statically", "See section 9 for live status of the Docker stack"],
                  ["Kubernetes", "Agent tools verified against scripted API objects; manifests schema-checked by tests", "See section 9 for live status of a cluster"],
                  ["LLM", "Deterministic offline planner used for all recorded conversations", "LLM tool-calling path is implemented and unit-tested with a fake client; no ANTHROPIC_API_KEY was configured here"]],
