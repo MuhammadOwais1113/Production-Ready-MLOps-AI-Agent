@@ -1,0 +1,14 @@
+# data/dataset.csv is tracked separately via `dvc add` (data/dataset.csv.dvc).
+# This pipeline records the reproducible training stage on top of that dataset.
+stages:
+  train:
+    cmd: python -m training.train
+    deps:
+      - data/dataset.csv
+      - training/pipeline.py
+      - training/train.py
+    params: []
+    outs:
+      - artifacts/model.joblib:
+          cache: true
+          persist: true

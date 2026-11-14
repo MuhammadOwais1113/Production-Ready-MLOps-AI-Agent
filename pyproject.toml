@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mlops-agent"
+version = "1.0.0"
+description = "Production-ready MLOps AI agent (DVC, MLflow, Airflow, Kubernetes)"
+requires-python = ">=3.10"
+dependencies = [
+  "pydantic>=2", "requests", "pyyaml", "fastapi", "uvicorn", "mlflow-skinny>=2.14", "kubernetes", "anthropic",
+]
+
+[project.optional-dependencies]
+agent = []
+training = ["pandas", "scikit-learn", "joblib", "numpy"]
+dvc = ["dvc"]
+dev = ["pytest", "ruff", "httpx", "reportlab", "pandas", "scikit-learn", "joblib", "numpy"]
+
+[tool.setuptools.packages.find]
+include = ["agent*", "api*", "training*", "serving*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 140
+extend-exclude = [".venv", "mlruns", "artifacts", "dvc_remote"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B"]
+ignore = ["E501", "B008"]

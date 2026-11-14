@@ -1,0 +1,15 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+mlruns/
+mlflow.db
+artifacts/
+models/
+dvc_remote/
+.env
+*.log
+/data/dataset.csv
+airflow_home/
+infra/.env
