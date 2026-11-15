@@ -363,10 +363,13 @@ def _correlate(ctx: dict[str, Any], s: Settings, plan: dict[str, Any]) -> tuple[
                 unc.append(f"Airflow DAG '{d['dag_id']}' has no recorded runs.")
             for run in d["runs"]:
                 facts.append(f"Airflow run {run['dag_run_id']}: {run['state']}; tasks {run['tasks']}.")
-            if d["runs"] and d["runs"][0]["state"] == "failed":
-                retrain_evidence.append("the latest Airflow training run failed")
-                if any("quality" in t and st == "failed" for t, st in d["runs"][0]["tasks"].items()):
-                    retrain_evidence.append("the model quality gate failed in the latest pipeline run")
+            done = [r for r in d["runs"] if r["state"] in ("success", "failed")]
+            if d["runs"] and d["runs"][0]["state"] in ("queued", "running"):
+                unc.append(f"Airflow run {d['runs'][0]['dag_run_id']} is still {d['runs'][0]['state']}; its outcome is not known yet.")
+            if done and done[0]["state"] == "failed":
+                retrain_evidence.append("the latest finished Airflow training run failed")
+                if any("quality" in t and st == "failed" for t, st in done[0]["tasks"].items()):
+                    retrain_evidence.append("the model quality gate failed in the latest finished pipeline run")
         elif name == "get_failed_tasks":
             if d["failed_tasks"]:
                 facts.append(f"Failed tasks in {d['dag_run_id']}: {d['failed_tasks']}; root failure(s): {d['root_failures']}.")

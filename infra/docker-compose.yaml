@@ -6,10 +6,10 @@ services:
   mlflow:
     image: python:3.11-slim
     command: >
-      bash -c "pip install -q 'mlflow==3.1.1' &&
+      bash -c "pip install -q 'mlflow==3.18.0' 'sqlalchemy>=2.0,<2.1' &&
       mlflow server --host 0.0.0.0 --port 5000
       --backend-store-uri sqlite:////mlflow/mlflow.db
-      --serve-artifacts --artifacts-destination /mlflow/artifacts"
+      --serve-artifacts --artifacts-destination /mlflow/artifacts --allowed-hosts '*' --cors-allowed-origins '*'"
     ports: ["5000:5000"]
     volumes: ["mlflow-data:/mlflow"]
     healthcheck:
@@ -24,11 +24,12 @@ services:
     ports: ["8080:8080"]
     environment:
       AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+      AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "false"
       AIRFLOW__CORE__DAGS_FOLDER: /opt/airflow/project/dags
       AIRFLOW__CORE__SIMPLE_AUTH_MANAGER_USERS: "admin:admin"
       AIRFLOW__CORE__SIMPLE_AUTH_MANAGER_PASSWORDS_FILE: /opt/airflow/passwords.json
       AIRFLOW__API_AUTH__JWT_EXPIRATION_TIME: "3600"
-      _PIP_ADDITIONAL_REQUIREMENTS: "pandas scikit-learn joblib numpy pyyaml sqlalchemy mlflow-skinny==3.1.1"
+      _PIP_ADDITIONAL_REQUIREMENTS: "pandas scikit-learn joblib numpy pyyaml mlflow-skinny==3.18.0"
       MLFLOW_TRACKING_URI: http://mlflow:5000
       REPO_ROOT: /opt/airflow/project
       PIPELINE_WORKDIR: /tmp/pipeline-artifacts

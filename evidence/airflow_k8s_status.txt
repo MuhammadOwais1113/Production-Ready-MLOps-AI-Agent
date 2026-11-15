@@ -1,3 +1,145 @@
+LIVE Airflow 3.0.6 (docker compose, real scheduler) - queried through the agent's tools
+
+list_airflow_dags: [('training_pipeline', True)]
+
+DAG run manual__2026-11-15T18:09:32.018028+00:00_jp31yJeC
+  state=failed conf={'degrade_model': True}
+    validate_dataset           success
+    preprocess_data            success
+    train_model                success
+    evaluate_and_log_mlflow    success
+    quality_gate               failed
+    promote_model              upstream_failed
+
+DAG run manual__2026-11-15T18:07:22.367237+00:00_LSWZIBOu
+  state=failed conf={}
+    validate_dataset           failed
+    preprocess_data            upstream_failed
+    train_model                upstream_failed
+    evaluate_and_log_mlflow    upstream_failed
+    quality_gate               upstream_failed
+    promote_model              upstream_failed
+
+DAG run manual__2026-11-15T18:05:57.683078+00:00_dCWBcD24
+  state=success conf={}
+    validate_dataset           success
+    preprocess_data            success
+    train_model                success
+    evaluate_and_log_mlflow    success
+    quality_gate               success
+    promote_model              success
+
+DAG run manual__2026-11-15T18:03:13.697650+00:00_zv7JuaQJ
+  state=failed conf={'degrade_model': True}
+    validate_dataset           success
+    preprocess_data            success
+    train_model                success
+    evaluate_and_log_mlflow    success
+    quality_gate               failed
+    promote_model              upstream_failed
+
+DIAGNOSIS manual__2026-11-15T18:09:32.018028: root failure=['quality_gate'] attempt=1 (retries configured=2)
+  log: ['ERROR quality gate failed: Quality gate FAILED: f1=0.6189 < threshold 0.85. Promotion blocked.', 'Task failed with exception']
+
+DIAGNOSIS manual__2026-11-15T18:07:22.367237: root failure=['validate_dataset'] attempt=1 (retries configured=2)
+  log: ["ERROR dataset validation failed: null values found: {'f3': 375}", 'Task failed with exception']
+
+LIVE MLflow server runs written by the Airflow DAG (with DVC provenance tags):
+  #8 2fb3a77c f1=0.6189 gate=failed dag_run=manual__2026-11-15T18:09:32.018028 dvc=v2.0 md5=c5b96f9c
+  #7 75e2ac05 f1=0.8995 gate=passed dag_run=manual__2026-11-15T18:05:57.683078 dvc=v2.0 md5=c5b96f9c
+  #6 3b33d73a f1=0.6189 gate=failed dag_run=manual__2026-11-15T18:03:13.697650 dvc=v2.0 md5=c5b96f9c
+  #5 b00c286c f1=0.8995 gate=passed dag_run=manual__2026-11-15T17:58:41.340449 dvc=v2.0 md5=c5b96f9c
+  #4 abc8e0c5 f1=0.6189 gate=failed dag_run=manual__2026-11-15T17:53:34.573918 dvc=v2.0 md5=c5b96f9c
+  #3 e354797b f1=0.8995 gate=passed dag_run=manual__2026-11-15T17:53:32.427568 dvc=v2.0 md5=c5b96f9c
+  #2 37f3a9e9 f1=0.6189 gate=failed dag_run=manual__2026-11-15T17:39:39.796889 dvc=v2.0 md5=c5b96f9c
+  #1 61defabf f1=0.8995 gate=passed dag_run=manual__2026-11-15T17:29:02.849496 dvc=v2.0 md5=c5b96f9c
+
+LIVE Kubernetes (Docker Desktop v1.36.1) - kubectl:
+NAME                            READY   UP-TO-DATE   AVAILABLE   AGE   CONTAINERS      IMAGES                  SELECTOR
+deployment.apps/inference-api   2/2     2            2           23m   inference-api   mlops-inference:1.0.0   app=inference-api
+
+NAME                                 READY   STATUS    RESTARTS   AGE     IP            NODE                    NOMINATED NODE   READINESS GATES
+pod/inference-api-6d8cc8f8b4-5vnmf   1/1     Running   0          2m13s   10.244.0.14   desktop-control-plane   <none>           <none>
+pod/inference-api-6d8cc8f8b4-dcw96   1/1     Running   0          110s    10.244.0.15   desktop-control-plane   <none>           <none>
+
+NAME                    TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)   AGE   SELECTOR
+service/inference-api   ClusterIP   10.96.90.252   <none>        80/TCP    23m   app=inference-api
+
+NAME                         DATA   AGE
+configmap/inference-config   4      23m
+configmap/kube-root-ca.crt   1      23m
+
+--- injected failure + fix, driven by the agent (evidence/k8s_live.txt) ---
+### INJECT: kubectl patch configmap inference-config  MODEL_PATH=/models/model_v9.joblib (missing file)
+configmap/inference-config patched
+
+### USER (no confirm): Restart the inference deployment
+[offline-planner | request b536c843dfd7]
+## MLOps agent report
+
+**Known facts (from tool evidence)**
+- (none)
+
+**Uncertainties**
+- `restart_k8s_deployment` needs your confirmation: 'restart_k8s_deployment' changes system state. Ask the user to explicitly confirm (re-send the request with confirm=true).. No claims are made about this part.
+
+**Recommended actions**
+- Re-send the same request with confirm=true if you really want this state-changing action.
+
+
+### USER (confirm=true): Restart the inference deployment
+[offline-planner | request f95dae8dcb5f]
+## MLOps agent report
+
+**Known facts (from tool evidence)**
+- restart_k8s_deployment executed: {'restarted': 'inference-api', 'namespace': 'mlops-agent'}
+
+**Uncertainties**
+- (none)
+
+### USER: Why is my prediction API unavailable?
+[offline-planner | request 93f7df183575]
+## MLOps agent report
+
+**Known facts (from tool evidence)**
+- Deployment inference-api: desired 2, ready 2, available 2.
+- Pods: inference-api-86545d8f86-bflh8[Running, ready=True, restarts=0], inference-api-86545d8f86-l9r4c[Running, ready=True, restarts=0], inference-api-cfbcd464b-xvpp5[Running, ready=False, restarts=0]
+- UNHEALTHY pod inference-api-cfbcd464b-xvpp5 (Running, 0 restarts): inference-api: running but NOT ready (readiness probe failing).
+-   event Unhealthy: Readiness probe failed: HTTP probe failed with statuscode: 503
+- Diagnosis for inference-api-cfbcd464b-xvpp5: inference-api: running but NOT ready (readiness probe failing).
+- Last log lines: 2026-11-15 17:49:52,698 ERROR readiness failed: FileNotFoundError: [Errno 2] No such file or directory: '/models/model_v9.joblib' | INFO:     10.244.0.1:52940 - "GET /ready HTTP/1.1" 503 Service Unavailable | INFO:     10.244.0.1:52942 - "GET /health HTTP/1.1" 200 OK | 2026-11-15 17:49:57,693 ERROR readiness failed: FileNotFoundError: [Errno 2] No such file or directory: '/models/model_v9.joblib' | INFO:     10.244.0.1:52946 - "GET /ready HTTP/1.1" 503 Service Unavailable
+- Service inference-api (ClusterIP) selector={'app': 'inference-api'} ports=[{'port': 80, 'target_port': '8000'}] ready endpoints=2.
+
+**Uncertainties**
+- (none)
+
+**Recommended actions**
+- Inspect the pod logs/events above; fix the root cause (image, config, resources or probe) before restarting.
+
+NAME                             READY   STATUS    RESTARTS   AGE
+inference-api-86545d8f86-bflh8   1/1     Running   0          2m23s
+inference-api-86545d8f86-l9r4c   1/1     Running   0          2m23s
+inference-api-cfbcd464b-xvpp5    0/1     Running   0          53s
+
+### FIX: restore MODEL_PATH, then restart via the agent
+configmap/inference-config patched
+**Known facts (from tool evidence)**
+- restart_k8s_deployment executed: {'restarted': 'inference-api', 'namespace': 'mlops-agent'}
+
+### VERIFY
+**Known facts (from tool evidence)**
+- Deployment inference-api: desired 2, ready 2, available 2.
+- Pods: inference-api-85677f5b44-5zdz5[Running, ready=True, restarts=0], inference-api-85677f5b44-r9n6r[Running, ready=True, restarts=0]
+- All 2 pods are healthy (no crash loops, pull errors or unready containers).
+
+### SAFETY (live): agent tool restart in kube-system, confirm=true
+denied - Namespace 'kube-system' is not approved. Approved namespaces: ['mlops-agent']
+denied - Namespace 'default' is not approved. Approved namespaces: ['mlops-agent']
+denied - Requested replicas 50 exceeds the allowed maximum 5
+
+coredns restartedAt annotation: 
+
+--- inference container (docker) ---
 $ docker run mlops-inference:1.0.0   (healthy)
 {"status":"ready"}
 {"prediction":1,"model_version":"5"}

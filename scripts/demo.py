@@ -55,6 +55,31 @@ def sh(*cmd: str) -> str:
     return (p.stdout + p.stderr).strip()
 
 
+def wait_dag_idle(agent: Orchestrator, timeout: int = 420) -> None:
+    """Live mode: block until no Airflow run is queued/running (real polling through the agent's own tool)."""
+    import time
+    end = time.time() + timeout
+    while time.time() < end:
+        r = agent.reg.execute("get_dag_run_status", {"limit": 3})
+        if r.ok and not any(x["state"] in ("queued", "running") for x in r.data["runs"]):
+            return
+        time.sleep(10)
+
+
+def trigger_live(agent: Orchestrator, title: str, conf: dict, mode: str) -> None:
+    r = agent.reg.execute("trigger_training_dag", {"conf": conf}, confirmed=True)
+    LOG.append({"title": title, "backends": mode, "question": f"(tool call) trigger_training_dag conf={conf} confirm=true", "confirm": True,
+                "response": {"answer": f"{r.status}: {r.data or r.error}", "tool_calls": [r.model_dump()]}})
+    print(f"\n=== {title}\n{r.status}: {r.data or r.error}")
+    wait_dag_idle(agent)
+
+
+def kubectl(*args: str) -> str:
+    out = sh("kubectl", *args)
+    print(f"$ kubectl {' '.join(args)}\n{out}")
+    return out
+
+
 def write_report() -> None:
     OUT.mkdir(exist_ok=True)
     (OUT / "conversations.json").write_text(json.dumps(LOG, indent=2, default=str), encoding="utf-8")
@@ -72,12 +97,14 @@ def main() -> None:
     live = "--live" in sys.argv
     a, m = agent_for(live)
     # ---- the five assessment scenarios
-    converse("Scenario 1 - Dataset provenance", "Which dataset version was used for experiment 4?", a, m)
+    converse("Scenario 1 - Dataset provenance", os.getenv("DEMO_EXPERIMENT_QUESTION", "Which dataset version was used for experiment 4?"), a, m)
     converse("Scenario 1b - Dataset versions compared", "Compare dataset versions v1.0 and v2.0", a, m)
     converse("Scenario 1c - Reproduce an old dataset (explanation)", "Explain how to reproduce dataset version v1.0", a, m)
     converse("Scenario 2 - Model selection", "Compare the last five training runs and recommend the best candidate based on F1 score.", a, m)
     converse("Scenario 3a - Pipeline trigger without confirmation (safety)", "Trigger the model training pipeline and report whether execution succeeded.", a, m)
     converse("Scenario 3b - Pipeline execution (confirmed)", "Trigger the model training pipeline and report whether execution succeeded.", a, m, confirm=True)
+    if live:
+        wait_dag_idle(a)
     converse("Scenario 3c - Pipeline status", "What is the status of the training pipeline DAG runs?", a, m)
     converse("Scenario 4 - Deployment health", "Check the deployment status in Kubernetes", a, m)
     converse("Scenario 5 - Multi-tool reasoning",
@@ -87,6 +114,8 @@ def main() -> None:
     print("\n##### INJECTING FAILURE 1: corrupt the DVC-tracked dataset (NaNs in column f3)")
     sh(sys.executable, "scripts/make_dataset.py", "--version", "2", "--corrupt")
     a1, m1 = agent_for(live, airflow="failed_validation")
+    if live:  # the Airflow container reads the same (now corrupted) data file through its bind mount -> genuine validation failure
+        trigger_live(a1, "Failure 1 - trigger DAG on the corrupted data", {}, m1)
     converse("Failure 1a - Has the data changed?", "Has the tracked dataset changed since it was versioned?", a1, m1)
     from training.pipeline import DataValidationError, validate
     try:
@@ -95,23 +124,37 @@ def main() -> None:
         print(f"REAL pipeline validate() -> DataValidationError: {exc}")
         LOG.append({"title": "Failure 1 - real validate() output", "backends": "REAL pipeline code", "question": "(direct call) validate()", "confirm": False,
                     "response": {"answer": f"DataValidationError: {exc}", "tool_calls": []}})
-    converse("Failure 1b - Why did the pipeline fail? (Airflow logs: scripted replica of this failure)", "Why did the training pipeline fail?", a1, m1)
+    converse("Failure 1b - Why did the training pipeline fail?", "Why did the training pipeline fail?", a1, m1)
     converse("Failure 1c - Resolve: restore the versioned data (needs confirm)", "Restore dataset version v2.0", a1, m1)
     converse("Failure 1d - Restore confirmed", "Restore dataset version v2.0", a1, m1, confirm=True)
     converse("Failure 1e - Verify the fix", "Has the tracked dataset changed since it was versioned?", a1, m1)
 
     # ---- injected failure 2: bad model path in the ConfigMap -> readiness probe fails, pods never ready (mocked cluster)
     print("\n##### INJECTING FAILURE 2: ConfigMap MODEL_PATH points to a missing file")
+    if live:
+        kubectl("-n", "mlops-agent", "patch", "configmap", "inference-config", "--type", "merge", "-p", '{"data":{"MODEL_PATH":"/models/model_v9.joblib"}}')
+        converse("Failure 2 - restart without confirmation", "Restart the inference deployment in kubernetes", a, m)
+        converse("Failure 2 - restart confirmed", "Restart the inference deployment in kubernetes", a, m, confirm=True)
+        import time
+        time.sleep(45)
+        converse("Failure 2 - Why is my prediction API unavailable?", "Why is my prediction API unavailable?", a, m)
+        kubectl("-n", "mlops-agent", "patch", "configmap", "inference-config", "--type", "merge", "-p", '{"data":{"MODEL_PATH":"/models/model.joblib"}}')
+        a.handle(ChatRequest(message="Restart the inference deployment in kubernetes", confirm=True))
+        kubectl("-n", "mlops-agent", "rollout", "status", "deploy/inference-api", "--timeout=150s")
+        converse("Failure 2 - verify fix", "Check the deployment status in Kubernetes", a, m)
     ev = [NS(type="Warning", reason="Unhealthy", message="Readiness probe failed: HTTP probe failed with statuscode: 503", count=14)]
     core = FakeCore([k8s_pod("inference-api-7c8d-aaaaa", ready=False, restarts=0), k8s_pod("inference-api-7c8d-bbbbb", ready=False, restarts=0)],
                     logs="INFO Started server process\nERROR MODEL LOAD FAILED: FileNotFoundError: [Errno 2] No such file or directory: '/models/model_v9.joblib'\n"
                          "ERROR readiness failed: FileNotFoundError: /models/model_v9.joblib",
                     events=ev, endpoints=0)
-    a2, m2 = agent_for(live, k8s=(core, FakeApps(ready=0)))
-    converse("Failure 2 - Why is my prediction API unavailable?", "Why is my prediction API unavailable?", a2, m2)
+    if not live:
+        a2, m2 = agent_for(live, k8s=(core, FakeApps(ready=0)))
+        converse("Failure 2 - Why is my prediction API unavailable?", "Why is my prediction API unavailable?", a2, m2)
 
     # ---- injected failure 3 (bonus): REAL quality-gate failure that already exists in MLflow (run 6, degraded model)
     a3, m3 = agent_for(live, airflow="quality_gate")
+    if live:
+        trigger_live(a3, "Failure 3 - trigger DAG with a degraded model", {"degrade_model": True}, m3)
     converse("Failure 3 - Quality gate blocks promotion", "Compare the last 6 mlflow runs on f1 and explain why the pipeline failed.", a3, m3)
     # ---- safety: unauthorized K8s change
     a4, m4 = agent_for(live)
