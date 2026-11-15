@@ -1,5 +1,7 @@
-Live Airflow 3 / Kubernetes were NOT exercised in the authoring environment:
-- Kubernetes: no cluster available (Docker Desktop Kubernetes not enabled; a kind download was blocked by the permission system and not worked around).
-- Airflow 3: infra/docker-compose.yaml (MLflow + Airflow 3 standalone) validates with `docker compose config`; the stack start was interrupted because Docker Desktop was manually paused (MLflow container exited 137). The DAG file was therefore verified statically (AST/structure test, ruff) and its stage functions run for real via training/train.py; it has not been parsed by an Airflow 3 scheduler here.
-- Real container evidence: the inference image was built and run with Docker (see evidence/inference_container.txt): healthy -> /ready 200, /predict works; missing model -> /health 200, /ready 503.
-To produce live screenshots: unpause Docker, `cd infra && docker compose up -d`, enable Kubernetes, apply kubernetes/*.yaml, then `python scripts/demo.py --live`.
+All four systems were exercised live in the authoring environment (Windows 11, Docker Desktop):
+- DVC 3.67 with a local remote; two dataset versions (git tags v1.0, v2.0); checkout/restore demonstrated.
+- MLflow: local SQLite store (7 runs) and an MLflow 3.18.0 server container (runs written by the Airflow DAG).
+- Airflow 3.0.6 (docker compose, standalone): DAG training_pipeline parsed with 0 import errors; runs triggered by the agent (confirm=true); success, quality-gate failure and validation failure observed with real task logs.
+- Kubernetes: Docker Desktop cluster v1.36.1; namespace mlops-agent; 2/2 replicas Ready; failure injected via ConfigMap; agent diagnosed, restarted with confirmation and verified recovery; restart in kube-system denied.
+- Unit tests (59) use mocks so CI needs no infrastructure.
+Not exercised: LLM tool-calling mode against the Anthropic API (no API key configured).

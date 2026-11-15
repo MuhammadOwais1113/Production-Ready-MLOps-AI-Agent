@@ -20,7 +20,7 @@ from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib.units import cm
-from reportlab.platypus import PageBreak, Paragraph, Preformatted, SimpleDocTemplate, Spacer, Table, TableStyle
+from reportlab.platypus import Image, KeepTogether, PageBreak, Paragraph, Preformatted, SimpleDocTemplate, Spacer, Table, TableStyle
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
@@ -170,10 +170,11 @@ def build() -> Path:
           P("1. Evidence honesty statement", H1),
           table([["Backend", "In this report", "Notes"],
                  ["DVC", "REAL (git + dvc CLI, local DVC remote)", "Two dataset versions v1.0 / v2.0, checkout demonstrated"],
-                 ["MLflow", "REAL (SQLite backend, runs written by the training pipeline)", "7 runs incl. a natural and an injected quality-gate failure"],
-                 ["Airflow 3", "Agent client verified against scripted Airflow REST responses (CI/demo); DAG file reviewed statically", "See section 9 for live status of the Docker stack"],
-                 ["Kubernetes", "Agent tools verified against scripted API objects; manifests schema-checked by tests", "See section 9 for live status of a cluster"],
-                 ["LLM", "Deterministic offline planner used for all recorded conversations", "LLM tool-calling path is implemented and unit-tested with a fake client; no ANTHROPIC_API_KEY was configured here"]],
+                 ["MLflow", "REAL (SQLite for local runs; MLflow 3.18 server in Docker for Airflow-written runs)", "7 local runs incl. a natural and an injected quality-gate failure"],
+                 ["Airflow 3", "REAL: Apache Airflow 3.0.6 (docker compose, standalone). DAG parsed by the real scheduler; runs triggered through the agent; JWT auth", "Success run + injected failures diagnosed from real task logs"],
+                 ["Kubernetes", "REAL: Docker Desktop Kubernetes v1.36.1; manifests applied; failure injected via ConfigMap; agent restarts/diagnoses", "Namespace denial verified against the live cluster"],
+                 ["LLM", "Deterministic offline planner used for all recorded conversations", "LLM tool-calling path is implemented and unit-tested with a fake client; no ANTHROPIC_API_KEY was configured here"],
+                 ["Unit tests (CI)", "Mocks for Kubernetes/Airflow/LLM; real git and MLflow SQLite", "CI never needs infrastructure"]],
                 [2.2 * cm, 7.5 * cm, W - 9.7 * cm])]
 
     S += [P("2. Complete system architecture", H1), arch_drawing(), P("Figure 1. Logical architecture (see architecture.md).", SMALL),
@@ -199,6 +200,17 @@ def build() -> Path:
     S += [P("5.3 Airflow and Kubernetes", H2), code(reg_txt or "See section 9."),
           P("Kubernetes manifests (kubernetes/): Deployment (2 replicas, readiness+liveness probes, requests/limits, envFrom ConfigMap), ClusterIP Service, ConfigMap, Namespace, least-privilege RBAC for the agent.", SMALL)]
 
+
+    S += [PageBreak(), P("5.4 Screenshots (captured from the live systems)", H2)]
+    for fn, cap in (("mlflow_experiment_runs.png", "MLflow 3.18 UI - training runs written by the Airflow DAG"),
+                    ("airflow_dag_runs.png", "Airflow 3 UI - training_pipeline grid, failed-task logs (quality gate, validation)"),
+                    ("kubernetes_live_terminal.png", "Kubernetes (Docker Desktop) - kubectl export and agent diagnosis")):
+        fp = ROOT / "screenshots" / fn
+        if fp.exists():
+            from reportlab.lib.utils import ImageReader
+            iw, ih = ImageReader(str(fp)).getSize()
+            w = W if ih / iw * W < 11 * cm else 11 * cm * iw / ih
+            S += [KeepTogether([P(cap, SMALL), Image(str(fp), width=w, height=w * ih / iw), Spacer(1, 6)])]
     S += [PageBreak(), P("6. Five tested agent conversations (actual tool evidence)", H1),
           P("Each answer below is the verbatim agent output; the tool-call list shows which tools were executed. Backends per conversation are labelled.", SMALL)]
     want = ["Scenario 1 - Dataset provenance", "Scenario 2 - Model selection", "Scenario 3b - Pipeline execution (confirmed)", "Scenario 4 - Deployment health", "Scenario 5 - Multi-tool reasoning"]
@@ -216,20 +228,20 @@ def build() -> Path:
 
     S += [PageBreak(), P("7. Failure investigations", H1)]
     f1 = [x for x in conv if x["title"].startswith("Failure 1")]
-    S += [P("Failure 1 - Corrupted tracked dataset (real DVC + real pipeline code)", H2),
+    S += [P("Failure 1 - Corrupted tracked dataset (real DVC, real Airflow)", H2),
           P("<b>Injection:</b> <font face='Courier'>python scripts/make_dataset.py --version 2 --corrupt</font> overwrote data/dataset.csv with NaNs in column f3 (25% of rows) without a DVC commit.<br/>"
             "<b>Diagnosis by the agent:</b> detect_data_changes (real <font face='Courier'>dvc status</font>) reported the file as <i>modified</i>; the pipeline validation stage raised <i>null values found: {'f3': 375}</i>; "
-            "Airflow-style diagnostics showed validate_dataset failed and all downstream tasks upstream_failed, i.e. training and promotion never ran on bad data.<br/>"
+            "the real Airflow task log of the triggered run showed validate_dataset failed (the Airflow container reads the same corrupted file through its bind mount) and all downstream tasks upstream_failed, i.e. training and promotion never ran on bad data.<br/>"
             "<b>Root cause:</b> workspace data diverged from the version recorded in DVC (data layer).<br/>"
             "<b>Resolution:</b> agent requested confirmation, then ran checkout_dataset_version(v2.0) (git checkout of the pointer + dvc checkout --force); dvc status returned 'up to date'. "
             "A real bug was found while doing this: dvc checkout refused to overwrite modified data without --force, so the first confirmed restore failed and the agent reported the DVC error rather than claiming success.")]
     for c in f1:
         S += [P(f"<b>{escape(c['title'])}</b> - {escape(c['question'])}", SMALL), code(clean_md(c["response"]["answer"]))]
     f2 = next((x for x in conv if x["title"].startswith("Failure 2")), None)
-    S += [P("Failure 2 - Wrong MODEL_PATH in the ConfigMap -> readiness failures (infrastructure layer; scripted cluster state)", H2),
-          P("<b>Injection:</b> ConfigMap MODEL_PATH points to a missing file; the inference service starts (liveness passes) but /ready returns 503, so pods are Running but never Ready and the Service has zero endpoints.<br/>"
-            "<b>Diagnosis:</b> the agent combined deployment (ready 0/2), pod state (running but NOT ready), Warning events (Readiness probe failed 503), log tail (FileNotFoundError ... model_v9.joblib) and the Service (0 ready endpoints) into one evidence chain.<br/>"
-            "<b>Root cause:</b> configuration error, not an image or resource problem (no restarts, no OOMKilled). <b>Resolution:</b> correct MODEL_PATH in kubernetes/configmap.yaml, kubectl apply, restart the deployment (agent: restart_k8s_deployment with confirm=true).")]
+    S += [P("Failure 2 - Wrong MODEL_PATH in the ConfigMap -> readiness failures (infrastructure layer; real Kubernetes cluster)", H2),
+          P("<b>Injection:</b> ConfigMap MODEL_PATH points to a missing file; the inference service starts (liveness passes) but /ready returns 503. With maxUnavailable=0 the rolling update keeps the old pods serving while the new pod stays Running but not Ready, so the rollout is stuck.<br/>"
+            "<b>Diagnosis:</b> the agent combined deployment status, pod state (running but NOT ready), Warning events (Readiness probe failed 503), log tail (FileNotFoundError ... model_v9.joblib) and the Service (0 ready endpoints) into one evidence chain.<br/>"
+            "<b>Root cause:</b> configuration error, not an image or resource problem (no restarts, no OOMKilled, image pulled fine). <b>Resolution:</b> correct MODEL_PATH in kubernetes/configmap.yaml, kubectl apply, restart the deployment (agent: restart_k8s_deployment with confirm=true).")]
     if f2:
         S += [code(clean_md(f2["response"]["answer"]))]
     f3 = next((x for x in conv if x["title"].startswith("Failure 3")), None)
@@ -256,9 +268,9 @@ def build() -> Path:
     S += [P("9. Live-infrastructure status in the authoring environment", H1),
           P((EV / "live_status.txt").read_text(encoding="utf-8").replace("\n", "<br/>") if (EV / "live_status.txt").exists() else "Not recorded."),
           P("10. Known limitations and proposed improvements", H1)]
-    for t in ["Offline planner is rule-based; LLM mode (Claude tool calling) handles paraphrases but needs an API key and was only verified with a fake client in this environment.",
-              "Airflow/Kubernetes behaviour is proven against scripted responses; run the Docker stack and a cluster to produce live screenshots for the demonstration.",
-              "Airflow 3 task-log API shape differs slightly across 3.x minors; the client accepts both JSON and plain-text log bodies.",
+    for t in ["Offline planner is rule-based; LLM mode (Claude tool calling) handles paraphrases but needs an API key and was only verified with a fake client in this environment. On Windows, localhost can resolve slowly to Docker ports; defaults use 127.0.0.1.",
+              "Docker Desktop Kubernetes shares the local Docker image store, so the locally built image works with imagePullPolicy IfNotPresent; on other clusters push the image to a registry. The Airflow stack uses the SimpleAuthManager with a locally generated password (demo only).",
+              "Airflow 3 task-log and ordering APIs differ slightly across 3.x minors (queued runs have no start_date, so runs are ordered by run_after); the client accepts JSON and plain-text log bodies.",
               "dvc checkout --force overwrites local edits (guarded by confirmation); a production system should stash or snapshot first.",
               "Single confirmation flag; use signed approvals, per-user RBAC and audit storage in production. Add model-drift / slice metrics to the promotion policy.",
               "Planner intent matching is keyword-based and may over- or under-select tools for unusual phrasing; extend with the LLM planner and an intent test-suite."]:

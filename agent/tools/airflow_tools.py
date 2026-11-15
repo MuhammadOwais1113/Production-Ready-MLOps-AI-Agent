@@ -65,7 +65,7 @@ class AirflowTools:
         self.approved = approved_dags
 
     def _latest_run_id(self, dag_id: str) -> str:
-        runs = self.c.request("GET", f"/dags/{dag_id}/dagRuns", params={"order_by": "-start_date", "limit": 1})
+        runs = self.c.request("GET", f"/dags/{dag_id}/dagRuns", params={"order_by": "-run_after", "limit": 1})
         lst = runs.get("dag_runs", [])
         if not lst:
             raise ToolError(f"DAG '{dag_id}' has no runs")
@@ -82,7 +82,7 @@ class AirflowTools:
             runs = [self.c.request("GET", f"/dags/{a.dag_id}/dagRuns/{a.dag_run_id}")]
         else:
             runs = self.c.request("GET", f"/dags/{a.dag_id}/dagRuns",
-                                  params={"order_by": "-start_date", "limit": a.limit}).get("dag_runs", [])
+                                  params={"order_by": "-run_after", "limit": a.limit}).get("dag_runs", [])
         out = []
         for r in runs:
             tis = self.c.request("GET", f"/dags/{a.dag_id}/dagRuns/{r['dag_run_id']}/taskInstances").get("task_instances", [])

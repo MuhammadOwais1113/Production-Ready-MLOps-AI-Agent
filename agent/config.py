@@ -20,11 +20,11 @@ class Settings:
     # DVC
     dvc_data_files: list[str] = field(default_factory=lambda: _csv("DVC_DATA_FILES", "data/dataset.csv.dvc"))
     # MLflow
-    mlflow_tracking_uri: str = field(default_factory=lambda: os.getenv("MLFLOW_TRACKING_URI", "http://localhost:5000"))
+    mlflow_tracking_uri: str = field(default_factory=lambda: os.getenv("MLFLOW_TRACKING_URI", "http://127.0.0.1:5000"))
     mlflow_experiment: str = field(default_factory=lambda: os.getenv("MLFLOW_EXPERIMENT", "mlops-agent-demo"))
     registered_model: str = field(default_factory=lambda: os.getenv("MLFLOW_MODEL_NAME", "classifier"))
     # Airflow 3
-    airflow_url: str = field(default_factory=lambda: os.getenv("AIRFLOW_URL", "http://localhost:8080"))
+    airflow_url: str = field(default_factory=lambda: os.getenv("AIRFLOW_URL", "http://127.0.0.1:8080"))
     airflow_username: str = field(default_factory=lambda: os.getenv("AIRFLOW_USERNAME", "admin"))
     airflow_password: str = field(default_factory=lambda: os.getenv("AIRFLOW_PASSWORD", ""))
     approved_dags: list[str] = field(default_factory=lambda: _csv("APPROVED_DAGS", "training_pipeline"))

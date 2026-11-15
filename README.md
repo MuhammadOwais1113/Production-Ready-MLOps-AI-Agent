@@ -17,9 +17,9 @@ pip install -e ".[dev,training,dvc]"
 |---|---|---|
 | `ANTHROPIC_API_KEY` | – | Enables LLM tool-calling mode. Without it the deterministic planner is used. |
 | `AGENT_MODEL` | `claude-sonnet-5-5` | Model for LLM mode |
-| `MLFLOW_TRACKING_URI` | `http://localhost:5000` | e.g. `sqlite:///mlflow.db` for the local demo |
+| `MLFLOW_TRACKING_URI` | `http://127.0.0.1:5000` | e.g. `sqlite:///mlflow.db` for the local demo |
 | `MLFLOW_EXPERIMENT` / `MLFLOW_MODEL_NAME` | `mlops-agent-demo` / `classifier` | |
-| `AIRFLOW_URL`, `AIRFLOW_USERNAME`, `AIRFLOW_PASSWORD` | `http://localhost:8080`, `admin`, – | Airflow 3 JWT login |
+| `AIRFLOW_URL`, `AIRFLOW_USERNAME`, `AIRFLOW_PASSWORD` | `http://127.0.0.1:8080`, `admin`, – | Airflow 3 JWT login |
 | `APPROVED_DAGS` | `training_pipeline` | DAGs the agent may trigger |
 | `APPROVED_NAMESPACES`, `K8S_NAMESPACE` | `mlops-agent` | Kubernetes namespace allow-list |
 | `MAX_MODEL_AGE_DAYS`, `QUALITY_GATE_F1` | `30`, `0.85` | Freshness policy and quality gate |
@@ -81,5 +81,10 @@ CI (`.github/workflows/ci.yml`) runs ruff + pytest on every pull request.
 * "Why is my prediction API unavailable?"
 * "Find the best recent model, identify the dataset version used to train it, check the deployment status, and explain whether retraining is necessary."
 
-Reproduce the evidence in `evidence/`: `python scripts/demo.py` (real DVC + MLflow; Kubernetes/Airflow mocked unless `--live`).
+Reproduce the evidence in `evidence/`:
+* `python scripts/demo.py` - real DVC + MLflow, Kubernetes/Airflow mocked (needs no infrastructure).
+* `python scripts/demo.py --live` - all four systems live. Needs `docker compose up -d` (infra/), Docker Desktop Kubernetes with the manifests applied, and
+  `MLFLOW_TRACKING_URI=http://127.0.0.1:5000 AIRFLOW_URL=http://127.0.0.1:8080 AIRFLOW_PASSWORD=<infra/.env value>`.
+  Use `127.0.0.1` rather than `localhost`: on Windows `localhost` can add ~20 s to the first request.
+Screenshots of the live MLflow and Airflow UIs are in `screenshots/`.
 The technical report is `report/MLOps_Agent_Technical_Report.pdf` (built by `python scripts/build_report.py`).

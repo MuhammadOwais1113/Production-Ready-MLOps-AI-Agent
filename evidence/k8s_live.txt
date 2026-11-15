@@ -1,0 +1,68 @@
+### INJECT: kubectl patch configmap inference-config  MODEL_PATH=/models/model_v9.joblib (missing file)
+configmap/inference-config patched
+
+### USER (no confirm): Restart the inference deployment
+[offline-planner | request b536c843dfd7]
+## MLOps agent report
+
+**Known facts (from tool evidence)**
+- (none)
+
+**Uncertainties**
+- `restart_k8s_deployment` needs your confirmation: 'restart_k8s_deployment' changes system state. Ask the user to explicitly confirm (re-send the request with confirm=true).. No claims are made about this part.
+
+**Recommended actions**
+- Re-send the same request with confirm=true if you really want this state-changing action.
+
+
+### USER (confirm=true): Restart the inference deployment
+[offline-planner | request f95dae8dcb5f]
+## MLOps agent report
+
+**Known facts (from tool evidence)**
+- restart_k8s_deployment executed: {'restarted': 'inference-api', 'namespace': 'mlops-agent'}
+
+**Uncertainties**
+- (none)
+
+### USER: Why is my prediction API unavailable?
+[offline-planner | request 93f7df183575]
+## MLOps agent report
+
+**Known facts (from tool evidence)**
+- Deployment inference-api: desired 2, ready 2, available 2.
+- Pods: inference-api-86545d8f86-bflh8[Running, ready=True, restarts=0], inference-api-86545d8f86-l9r4c[Running, ready=True, restarts=0], inference-api-cfbcd464b-xvpp5[Running, ready=False, restarts=0]
+- UNHEALTHY pod inference-api-cfbcd464b-xvpp5 (Running, 0 restarts): inference-api: running but NOT ready (readiness probe failing).
+-   event Unhealthy: Readiness probe failed: HTTP probe failed with statuscode: 503
+- Diagnosis for inference-api-cfbcd464b-xvpp5: inference-api: running but NOT ready (readiness probe failing).
+- Last log lines: 2026-11-15 17:49:52,698 ERROR readiness failed: FileNotFoundError: [Errno 2] No such file or directory: '/models/model_v9.joblib' | INFO:     10.244.0.1:52940 - "GET /ready HTTP/1.1" 503 Service Unavailable | INFO:     10.244.0.1:52942 - "GET /health HTTP/1.1" 200 OK | 2026-11-15 17:49:57,693 ERROR readiness failed: FileNotFoundError: [Errno 2] No such file or directory: '/models/model_v9.joblib' | INFO:     10.244.0.1:52946 - "GET /ready HTTP/1.1" 503 Service Unavailable
+- Service inference-api (ClusterIP) selector={'app': 'inference-api'} ports=[{'port': 80, 'target_port': '8000'}] ready endpoints=2.
+
+**Uncertainties**
+- (none)
+
+**Recommended actions**
+- Inspect the pod logs/events above; fix the root cause (image, config, resources or probe) before restarting.
+
+NAME                             READY   STATUS    RESTARTS   AGE
+inference-api-86545d8f86-bflh8   1/1     Running   0          2m23s
+inference-api-86545d8f86-l9r4c   1/1     Running   0          2m23s
+inference-api-cfbcd464b-xvpp5    0/1     Running   0          53s
+
+### FIX: restore MODEL_PATH, then restart via the agent
+configmap/inference-config patched
+**Known facts (from tool evidence)**
+- restart_k8s_deployment executed: {'restarted': 'inference-api', 'namespace': 'mlops-agent'}
+
+### VERIFY
+**Known facts (from tool evidence)**
+- Deployment inference-api: desired 2, ready 2, available 2.
+- Pods: inference-api-85677f5b44-5zdz5[Running, ready=True, restarts=0], inference-api-85677f5b44-r9n6r[Running, ready=True, restarts=0]
+- All 2 pods are healthy (no crash loops, pull errors or unready containers).
+
+### SAFETY (live): agent tool restart in kube-system, confirm=true
+denied - Namespace 'kube-system' is not approved. Approved namespaces: ['mlops-agent']
+denied - Namespace 'default' is not approved. Approved namespaces: ['mlops-agent']
+denied - Requested replicas 50 exceeds the allowed maximum 5
+
+coredns restartedAt annotation: 
